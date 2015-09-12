@@ -68,11 +68,12 @@ EvalWeighted_HJJ_fulldecay = 0d0
    HZZcoupl(4) = ghz4
    HZZcoupl(5:) = (0d0,0d0)
    
-   HWWcoupl(1) = 1d0! HZZcoupl(1)!  ghw1  ! this is actually wrong
-   HWWcoupl(2) = ghw2
-   HWWcoupl(3) = ghw3
-   HWWcoupl(4) = ghw4
-   HWWcoupl(5:) = (0d0,0d0)
+   HWWcoupl(:) = 0d0
+!    HWWcoupl(1) = 1d0! HZZcoupl(1)!  ghw1  ! this is actually wrong
+!    HWWcoupl(2) = ghw2
+!    HWWcoupl(3) = ghw3
+!    HWWcoupl(4) = ghw4
+!    HWWcoupl(5:) = (0d0,0d0)
       
 !    print *, (MomExt(1:4,1)).dot.(MomExt(1:4,1))
 !    print *, (MomExt(1:4,2)).dot.(MomExt(1:4,2))
@@ -95,17 +96,20 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !    pause
   
 
-! 1.982278980884535E-005  zz
-! 3.186871063969136E-005  ww
+! zz    0.00154069029057
+! ww    0.00154134203474   (with 1/2 fix) 
+! zz+ww  
+! interf.  0.00154105539177    (with 1/2 fix) 
+! all   0.00154134203967     (with 1/2 fix)    !   with normal gwsq : 1.429448613818515E-003 or 1.428844253926173E-003
 
-  i=1; j=2;
+
+  i=1; j=-1;
   msq_MCFM(:,:) = 0d0
-!   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
-  msq_MCFM=msq_MCFM/(9.495632068338d-2)**3   !/ (1.11379452919968d0)
+  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+  msq_MCFM(:,:) = msq_MCFM(:,:)/(9.495632068338d-2)**3! removing esq^3
   print *, "new ",msq_MCFM(j,i)
 
   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),HZZcoupl(1:4),HWWcoupl(1:4),me2)
-!   msq_MCFM(:,:) = me2(:,:)
   print *, "old ",me2(i,j)
   print *, "rat", msq_MCFM(j,i)/me2(i,j)
   pause
@@ -132,10 +136,10 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    
    
-   NBin(7) = WhichBin(7, dlog10( EvalWeighted_HJJ_fulldecay*VgsWgt )  )
-   do NHisto=1,NumHistograms
-       call intoHisto(NHisto,NBin(NHisto),EvalWeighted_HJJ_fulldecay*VgsWgt)
-   enddo
+!    NBin(7) = WhichBin(7, dlog10( EvalWeighted_HJJ_fulldecay*VgsWgt )  )
+!    do NHisto=1,NumHistograms
+!        call intoHisto(NHisto,NBin(NHisto),EvalWeighted_HJJ_fulldecay*VgsWgt)
+!    enddo
 
 
 

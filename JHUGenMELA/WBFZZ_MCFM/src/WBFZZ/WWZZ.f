@@ -150,6 +150,7 @@ c--- Make sure WWZA vertices included
       i7=n7
       i8=n8
       do h56=1,2
+!       do h56=1,1; print *, "freeze"
         if (h56.eq.1) then 
           i5=n5
           i6=n6
@@ -158,6 +159,7 @@ c--- Make sure WWZA vertices included
           i6=n5
         endif
         do h34=1,2
+!         do h34=1,1; print *, "freeze"
          if (h34.eq.1) then 
             i3=n3
             i4=n4
@@ -174,15 +176,17 @@ c--- Make sure WWZA vertices included
      &    *ggWW(h34,h56)/(propw17*propw28)*Bbit
 
 
-! !      MARKUS: removed decay     
+!      MARKUS: removed decay     
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     & -2d0*sqzmass/cxw**2  *ZZ3456(h34,h56)
+     & -2d0*sqzmass/cxw**2                   !   <----  where is the factor 2.0 coming from::  ZZH amplitudes also have a global factor 2 in ZZ1728 (for no good reason)
      & *za(i7,i8)*zb(i2,i1)
-     & /(propw17*propw28)/4d0/ZZ3456(h34,h56)
-!      & /zmass*cxw**2/sqrt(cxw)**3d0*sqrt(1d0-cxw) !-- only  MCFM PR
-     & /zmass*cxw*sqrt(1d0-cxw) !-- only  MCFM PR
+     & /(propw17*propw28)
+     & /zmass*sqrt(cxw)*sqrt(1d0-cxw) !-- only  MCFM PR
+     &     *0.5d0  ! MARKUS: artificially introduce 1/2 here , seems like a bug in MCFM but not sure yet.
 
-          
+
+
+
 !       MCFM original + anomalous
 !          WWZZamp(h34,h56)=WWZZamp(h34,h56)
 !      & -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)

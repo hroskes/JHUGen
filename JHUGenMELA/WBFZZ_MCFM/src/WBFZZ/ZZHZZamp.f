@@ -50,7 +50,7 @@ C---end statement functions
       enddo
       enddo
       endif
-      fac=-zmass**2/(cxw*(cone-cxw)) ! MARKUS: why is this zmass**2 and not czmass2
+      fac=-zmass**2/(cxw*(cone-cxw)) ! this is the HZZ coupling squared
 
 C---setup propagators
       s3456=t4(n3,n4,n5,n6)
@@ -90,6 +90,7 @@ C---setup propagators
             i8=n2
          endif
       do h34=1,2
+!       do h34=1,1; print *, "freeze"
          if (h34.eq.1) then 
             i3=n3
             i4=n4
@@ -98,6 +99,7 @@ C---setup propagators
             i4=n3
          endif
       do h56=1,2
+!       do h56=1,1; print *, "freeze"
          if (h56.eq.1) then 
             i5=n5
             i6=n6
@@ -121,15 +123,19 @@ C---s-channel  MCFM original+anomalous
     
      
 
-! ! C---s-channel   MARKUS: removed decay
-!       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
-!      & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
-! !      & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !-- removed from MCFM
-!      & *za(i7,i8)*zb(i2,i1)
-!      & /ZZ3456(h34,h56)/4d0/(prop17*prop28)/sqrt(fac)  !-- only  MCFM PR
-! !      & *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--added by Fabrizio (anomal. DK)
-! !      & *anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--added by Fabrizio (anomal. PR)
-! !      & /(propWBF*prop3456)
+! C---s-channel   MARKUS: removed decay
+      ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
+     & +fac*ZZ1728(jdu1,jdu2,h17,h28)
+!      & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !-- removed from MCFM
+     & *za(i7,i8)*zb(i2,i1)
+     & /(prop17*prop28)/( zmass/sqrt(cxw*(cone-cxw)) )  !-- only  MCFM PR
+!      & *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--added by Fabrizio (anomal. DK)
+!      & *anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--added by Fabrizio (anomal. PR)
+!      & /(propWBF*prop3456)
+
+
+
+
 
 
 

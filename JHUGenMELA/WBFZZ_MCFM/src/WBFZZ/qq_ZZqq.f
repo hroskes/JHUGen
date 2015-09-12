@@ -88,7 +88,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       data mt,twidth/173.2d0,2.5d0/
       data hmass,hwidth/125d0,0.00415d0/
       data wmass,wwidth/80.399d0,2.085d0/
-      data zmass,zwidth/91.1876d0,2.4952d0/
+      data zmass,zwidth/91.6940457545d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246.218458101816d0/
       data gw,xw/0.653070453124d0,0.23119d0/
       data gwsq,esq/0.426501016743344d0,9.495632068338d-2/
@@ -265,8 +265,8 @@ c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
 
       if (first) then
-       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-       czmass2=dcmplx(zmass**2,-zmass*zwidth)
+       cwmass2=dcmplx(wmass**2,-wmass*wwidth  )
+       czmass2=dcmplx(zmass**2,-zmass*zwidth   )
        cxw=cone-cwmass2/czmass2
        call couplz(xw)
 
@@ -276,7 +276,8 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
        r1=re
        r2=re
        
-c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
+!             cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
+
        write(6,*)
        write(6,*) '**************** Complex-mass scheme ***************'
        write(6,*) '*                                                  *'
@@ -322,7 +323,11 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
+
+
       do j=1,12
+!       do j=2,2; print *, "cut loop over qq-->Hqq",j
+
       temp(:,:)=0d0
       tempw(:,:)=0d0
       amp(:,:,:,:,:)=czip
@@ -387,7 +392,7 @@ C-----Singly resonant production in VBF style diagrams
       
 ! C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,ZZHamp71_82)
+     & za,zb,ZZHamp71_82)                                        ! only need this for check
       
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,ZZHamp81_72)
@@ -396,13 +401,12 @@ C-----Singly resonant production in VBF style diagrams
 C----Four boson vertex + WW->Higgs diagram 
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
-     
+!      
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
+     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)                ! only need this for check
 
      
-     
-     
+    
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
       do h2=1,2
@@ -655,22 +659,22 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
      & -srWWZZ81_72amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
       endif
       
-      ampa(dquq_dquq,h1,h2,h3,h5)=Bbit*ampa(dquq_dquq,h1,h2,h3,h5)
+      ampa(dquq_dquq,h1,h2,h3,h5)=Bbit*ampa(dquq_dquq,h1,h2,h3,h5)         !  MARKUS: WW-->H
      & +WWZZ81_72amp(h3,h5)
       endif
 
 C--Fill Z exchange diagrams
-      ampb(dquq_dquq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
+      ampb(dquq_dquq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)                ! MARKUS:  ZZ-->H
        
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+      temp(1,2)=temp(1,2)+esq**6*spinavge         !  MARKUS: WW-->H
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+     & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))         !  *00000000d0
+      temp(1,2)=temp(1,2)+esq**6*spinavge        ! MARKUS:  ZZ-->H
      &   *dble(ampb(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
+     & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))          ! *000000d0
+      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge          ! interf. term 
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
+     & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))           !  *00000000000000d0
       enddo
       enddo
       enddo

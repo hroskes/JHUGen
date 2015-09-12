@@ -59,7 +59,7 @@ logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if
 
 real(8), public            :: M_Top   = 173.2d0   *GeV      ! top quark mass
 real(8), public, parameter :: Ga_Top  = 2.0d0     *GeV      ! top quark width
-real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
+real(8), public, parameter :: M_Z     = 91.6940457545d0 * GeV !for checks MZ=MW/cw        !91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
@@ -78,8 +78,8 @@ real(8), public, parameter :: Ga_tau =4d-13        *GeV         ! tau width
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
-real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/128d0         ! el.magn. coupling
+real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared, = e^2/sw^2
+real(8), public, parameter :: alpha_QED = 1d0/127.444d0     ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)

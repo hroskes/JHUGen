@@ -94,12 +94,12 @@ mod_TH_MatEl.o: mod_TH_MatEl.F90 variables.F90
 
 MCFMforVBF: $(MCFM_Dep)
 	@echo " "
-	@echo " compiling MCFM WBF files with "$(Comp)
+# 	@echo " compiling MCFM WBF files with "$(Comp)
 # 	$(fcomp) -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
 # 
-	@echo " compiling MCFM WBF files with ifort!"
+	@echo " compiling MCFM WBF files with ifort! FOR DEBUGGING PURPOSES ONLY"
 	ifort  -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
-	ifort  -O2  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+	ifort  -O0  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
 
 clean:
 	@echo " deleting object files"

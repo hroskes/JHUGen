@@ -14,6 +14,8 @@ module modHiggsJJ
   real(dp), parameter :: twosc = sqrt(4.0_dp*xw*(1.0_dp-xw))
   real(dp), parameter :: gs = sqrt(alphas*4.0_dp*pi)
 
+real(dp),parameter,private:: gwsq_check = 9.495632068338d-2/xw
+
   integer, target :: pdfGlu_ = 0
  
   integer, target :: pdfDn_ = 1
@@ -163,8 +165,8 @@ contains
     complex(dp) :: za(4,4), zb(4,4)
     real(dp), parameter :: Lu = aL_QUp**2, Ru = aR_QUp**2
     real(dp), parameter :: Ld = aL_QDn**2, Rd = aR_QDn**2
-    real(dp), parameter :: couplz = gwsq * xw/twosc**2         *M_Z/sitW/dsqrt(1d0-sitW**2)! MARKUS ADDED HVV COUPLINGS: CHECK!!
-    real(dp), parameter :: couplw = gwsq/two                   *M_W/sitW
+    real(dp), parameter :: couplz = gwsq * xw/twosc**2 
+    real(dp), parameter :: couplw = gwsq/two         
     real(dp) :: restmp
     integer :: i, j, j1, j2, iflip, pdfindex(2)
 
@@ -250,14 +252,25 @@ contains
        endif
 
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
-            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
-            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
-            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2  *00
+                 (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+                 (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+                 (abs(amp_z(+1,+1))**2) * Rd * Ru  ) * couplz**2 * xn**2  !  *0000000
 
-       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
+! print *, "JHU zz coupl",sqrt(Ld * Lu* couplz**2)*100d0
+! print *, "JHU zz coupl",sqrt(Rd * Lu* couplz**2)*100d0
+! print *, "JHU zz coupl",sqrt(Ld * Ru* couplz**2)*100d0
+! print *, "JHU zz coupl",sqrt(Rd * Ru * couplz**2)*100d0
+! print *, "JHU zz ampsq",((abs(amp_z(-1,-1))**2) )!* Ld * Lu)* couplz**2 * xn**2 * aveqq
+! print *, "JHU zz ampsq",((abs(amp_z(+1,-1))**2) )!* Rd * Lu)* couplz**2 * xn**2 * aveqq
+! print *, "JHU zz ampsq",((abs(amp_z(-1,+1))**2) )!* Ld * Ru)* couplz**2 * xn**2 * aveqq
+! print *, "JHU zz ampsq",((abs(amp_z(+1,+1))**2) )!* Rd * Ru)* couplz**2 * xn**2 * aveqq
+
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2  !  *0000000
+! print *, "JHU ww coupl", couplw*100d0
+! print *, "JHU ww ampsq", abs(amp_w(-1,-1))**2!* couplw**2 * xn**2  * aveqq
 
        restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
-            aL_QUp * aL_QDn * couplz * couplw * xn   *00000000d0 !MARKUS: switching off the interference
+            aL_QUp * aL_QDn * couplz * couplw * xn   !*00000000d0 !MARKUS: switching off the interference
 
        restmp = restmp * aveqq
 
