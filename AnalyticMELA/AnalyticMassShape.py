@@ -1,8 +1,10 @@
+import re
 import ROOT
 
 #============================
 #parameters
 decaymode = "Z"
+
 constants = {
              "M_Reso": None,
              "Ga_Reso": None,
@@ -17,6 +19,9 @@ constants = {
             }
 #if None, read from
 #../JHUgen/mod_Parameters.F90
+
+m4lmin = 650
+m4lmax = 850
 #============================
 
 #http://arxiv.org/pdf/1208.4018v3.pdf
@@ -31,10 +36,13 @@ with open("../JHUGenerator/mod_Parameters.F90") as f:
     for line in f:
         line = line.split("!")[0]
         for constantname in constants:
-            if constants[constantname] is None and constantname in line:
-                line = line.split("=")[1].split("*")[0]          #isolate the number
-                line = line.replace("d", "e").replace("D", "E")  #fortran format --> normal format
-                constants[constantname] = float(line)
+            if constants[constantname] is None:
+                regex = r"\W" + constantname + r"\s*=([^!*]*)"
+                result = re.search(regex, line)
+                if result:
+                    value = result.group(1)
+                    value = value.replace("d", "e").replace("D", "E")  #fortran format --> normal format
+                    constants[constantname] = float(value)
 
 for constantname in constants:
     if constants[constantname] is None:
@@ -50,7 +58,7 @@ a1 = ROOT.RooConstVar("a1", "a1", constants["ghz1"])
 a2 = ROOT.RooConstVar("a1", "a1", constants["ghz2"])
 a3 = ROOT.RooConstVar("a1", "a1", constants["ghz4"])
 
-m4l = ROOT.RooRealVar("m4l", "m4l", constants["M_Reso"], 0, 2000)
+m4l = ROOT.RooRealVar("m4l", "m4l", constants["M_Reso"], m4lmin, m4lmax)
 m1 = ROOT.RooRealVar("m1", "m1", constants["M_%s"%decaymode], 0, 200)
 m2 = ROOT.RooRealVar("m2", "m2", constants["M_%s"%decaymode], 0, 200)
 
@@ -71,10 +79,13 @@ P = ROOT.RooFormulaVar("P", "P",
                       )
 
 #final distribution, eq. (7)
-pdf = ROOT.RooGenericPdf("pdf", "pdf", "(@1**2 + @2**2 + @3**2) * @4", ROOT.RooArgList(A00, App, Amm, P))
+pdf = ROOT.RooGenericPdf("pdf", "pdf", "(@0**2 + @1**2 + @2**2) * @3", ROOT.RooArgList(A00, App, Amm, P))
 
 frame = m4l.frame()
 c1 = ROOT.TCanvas.MakeDefCanvas()
 pdf.createProjection(ROOT.RooArgSet(m1, m2)).plotOn(frame)
 frame.Draw()
 c1.SaveAs("AnalyticMassShape.png")
+c1.SaveAs("AnalyticMassShape.eps")
+c1.SaveAs("AnalyticMassShape.pdf")
+c1.SaveAs("AnalyticMassShape.root")
