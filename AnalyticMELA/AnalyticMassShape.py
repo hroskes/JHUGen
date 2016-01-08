@@ -68,7 +68,7 @@ Reg4 = ROOT.RooConstVar("Reg3", "Reg3", complexconstants["ghz4"].real)
 Img4 = ROOT.RooConstVar("Img3", "Img3", complexconstants["ghz4"].imag)
 
 #define RooRealVars
-m4l = ROOT.RooRealVar("m4l", "m4l", realconstants["M_Reso"], m4lmin, m4lmax)
+m4l = ROOT.RooRealVar("m4l", "m4l", m4lmin, m4lmin, m4lmax)
 m1 = ROOT.RooRealVar("m1", "m1", realconstants["M_%s"%decaymode], 0, 200)
 m2 = ROOT.RooRealVar("m2", "m2", realconstants["M_%s"%decaymode], 0, 200)
 
