@@ -6,7 +6,6 @@ import ROOT
 decaymode = "Z"
 
 realconstants = {
-                 "M_Reso": None,
                  "M_Z": None,
                  "Ga_Z": None,
                  "M_W": None,
@@ -58,22 +57,36 @@ for constants in realconstants, complexconstants:
         if constants[constantname] is None:
             raise IOError("Value of %s not found in mod_Parameters!" % constantname)
 
-
+#define RooConstVars
 mV = ROOT.RooConstVar("mV", "mV", realconstants["M_%s"%decaymode])
-mH = ROOT.RooConstVar("mH", "mH", realconstants["M_Reso"])
 gammaV = ROOT.RooConstVar("gammaV", "gammaV", realconstants["Ga_%s"%decaymode])
-Rea1 = ROOT.RooConstVar("Rea1", "Rea1", complexconstants["ghz1"].real)
-Ima1 = ROOT.RooConstVar("Ima1", "Ima1", complexconstants["ghz1"].imag)
-Rea2 = ROOT.RooConstVar("Rea2", "Rea2", complexconstants["ghz2"].real)
-Ima2 = ROOT.RooConstVar("Ima2", "Ima2", complexconstants["ghz2"].imag)
-Rea3 = ROOT.RooConstVar("Rea3", "Rea3", complexconstants["ghz4"].real)
-Ima3 = ROOT.RooConstVar("Ima3", "Ima3", complexconstants["ghz4"].imag)
+Reg1 = ROOT.RooConstVar("Reg1", "Reg1", complexconstants["ghz1"].real)
+Img1 = ROOT.RooConstVar("Img1", "Img1", complexconstants["ghz1"].imag)
+Reg2 = ROOT.RooConstVar("Reg2", "Reg2", complexconstants["ghz2"].real)
+Img2 = ROOT.RooConstVar("Img2", "Img2", complexconstants["ghz2"].imag)
+Reg4 = ROOT.RooConstVar("Reg3", "Reg3", complexconstants["ghz4"].real)
+Img4 = ROOT.RooConstVar("Img3", "Img3", complexconstants["ghz4"].imag)
 
+#define RooRealVars
 m4l = ROOT.RooRealVar("m4l", "m4l", realconstants["M_Reso"], m4lmin, m4lmax)
 m1 = ROOT.RooRealVar("m1", "m1", realconstants["M_%s"%decaymode], 0, 200)
 m2 = ROOT.RooRealVar("m2", "m2", realconstants["M_%s"%decaymode], 0, 200)
 
-x = ROOT.RooFormulaVar("x", "x", "((@0**2-@1**2-@2**2)/(2*@1*@2))**2-1", ROOT.RooArgList(mH, m1, m2))  #eq. (15)
+
+
+#eq. (13)
+s = ROOT.RooFormulaVar("s", "s", "(@0**2-@1**2-@2**2)/2", ROOT.RooArgList(m4l, m1, m2))
+
+#eq. (15)
+x = ROOT.RooFormulaVar("x", "x", "(@0/(@1*@2))**2-1", ROOT.RooArgList(s, m1, m2))
+
+#eq. (12)
+Rea1 = ROOT.RooFormulaVar("Rea1", "Rea1", "@0*(@1/@2)**2 + 2*@3*@4/@2**2", ROOT.RooArgList(Reg1, mV, m4l, Reg2, s, m4l))
+Ima1 = ROOT.RooFormulaVar("Ima1", "Ima1", "@0*(@1/@2)**2 + 2*@3*@4/@2**2", ROOT.RooArgList(Img1, mV, m4l, Img2, s, m4l))
+Rea2 = ROOT.RooFormulaVar("Rea2", "Rea2", "-2*@0", ROOT.RooArgList(Reg2))
+Ima2 = ROOT.RooFormulaVar("Ima2", "Ima2", "-2*@0", ROOT.RooArgList(Img2))
+Rea3 = ROOT.RooFormulaVar("Rea3", "Rea3", "-2*@0", ROOT.RooArgList(Reg4))
+Ima3 = ROOT.RooFormulaVar("Ima3", "Ima3", "-2*@0", ROOT.RooArgList(Img4))
 
 #eq. (14)
 ReA00 = ROOT.RooFormulaVar("ReA00", "ReA00", "-@0**2 * (@1*sqrt(1+@2) + @3*(@4*@5/@0**2)*@2)      ", ROOT.RooArgList(m4l, Rea1, x, Rea2, m1, m2))
