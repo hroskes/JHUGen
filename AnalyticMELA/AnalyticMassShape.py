@@ -64,8 +64,8 @@ Reg1 = ROOT.RooConstVar("Reg1", "Reg1", complexconstants["ghz1"].real)
 Img1 = ROOT.RooConstVar("Img1", "Img1", complexconstants["ghz1"].imag)
 Reg2 = ROOT.RooConstVar("Reg2", "Reg2", complexconstants["ghz2"].real)
 Img2 = ROOT.RooConstVar("Img2", "Img2", complexconstants["ghz2"].imag)
-Reg4 = ROOT.RooConstVar("Reg3", "Reg3", complexconstants["ghz4"].real)
-Img4 = ROOT.RooConstVar("Img3", "Img3", complexconstants["ghz4"].imag)
+Reg4 = ROOT.RooConstVar("Reg4", "Reg4", complexconstants["ghz4"].real)
+Img4 = ROOT.RooConstVar("Img4", "Img4", complexconstants["ghz4"].imag)
 
 #define RooRealVars
 m4l = ROOT.RooRealVar("m4l", "m4l", m4lmin, m4lmin, m4lmax)
