@@ -23,7 +23,7 @@ complexconstants = {
 #if None, read from
 #../JHUgenerator/mod_Parameters.F90
 
-m4lmin = 0
+m4lmin = 60
 m4lmax = 1000
 #==================================
 
@@ -102,8 +102,8 @@ def spin2():
 
     #define RooRealVars
     m4l = ROOT.RooRealVar("m4l", "m4l", m4lmin, m4lmin, m4lmax)
-    m1 = ROOT.RooRealVar("m1", "m1", realconstants["M_%s"%decaymode], 0, 200)
-    m2 = ROOT.RooRealVar("m2", "m2", realconstants["M_%s"%decaymode], 0, 200)
+    m1 = ROOT.RooRealVar("m1", "m1", realconstants["M_%s"%decaymode], 4, 200)
+    m2 = ROOT.RooRealVar("m2", "m2", realconstants["M_%s"%decaymode], 4, 200)
 
 
 
@@ -180,17 +180,19 @@ def spin2():
     - (m1**2-m2**2)**2/m4l**2 * c1/4
     """
 
-    realvars = [m4l, m1, m2, s]
+    realvars = [m4l, m1, m2, s, x]
     complexvars = [(Rec1, Imc1), (Rec2, Imc2), (Rec41, Imc41), (Rec42, Imc42)]
-    ReA00, ImA00 = string2RooFormulaVar("A00", "A00", A00string, realvars, complexvars)
-    ReApp, ImApp = string2RooFormulaVar("App", "App", Appstring, realvars, complexvars)
-    ReAmm, ImAmm = string2RooFormulaVar("Amm", "Amm", Ammstring, realvars, complexvars)
-    ReAp0, ImAp0 = string2RooFormulaVar("Ap0", "Ap0", Ap0string, realvars, complexvars)
-    ReA0p, ImA0p = string2RooFormulaVar("A0p", "A0p", A0pstring, realvars, complexvars)
-    ReAm0, ImAm0 = string2RooFormulaVar("Am0", "Am0", Am0string, realvars, complexvars)
-    ReA0m, ImA0m = string2RooFormulaVar("A0m", "A0m", A0mstring, realvars, complexvars)
-    ReApm, ImApm = string2RooFormulaVar("Apm", "Apm", Apmstring, realvars, complexvars)
-    ReAmp, ImAmp = string2RooFormulaVar("Amp", "Amp", Ampstring, realvars, complexvars)
+    ReA = {}
+    ImA = {}
+    ReA[0,0], ImA[0,0] = string2RooFormulaVar("A00", "A00", A00string, realvars, complexvars)
+    ReA[1,1], ImA[1,1] = string2RooFormulaVar("App", "App", Appstring, realvars, complexvars)
+    ReA[-1,-1], ImA[-1,-1] = string2RooFormulaVar("Amm", "Amm", Ammstring, realvars, complexvars)
+    ReA[1,0], ImA[1,0] = string2RooFormulaVar("Ap0", "Ap0", Ap0string, realvars, complexvars)
+    ReA[0,1], ImA[0,1] = string2RooFormulaVar("A0p", "A0p", A0pstring, realvars, complexvars)
+    ReA[-1,0], ImA[-1,0] = string2RooFormulaVar("Am0", "Am0", Am0string, realvars, complexvars)
+    ReA[0,-1], ImA[0,-1] = string2RooFormulaVar("A0m", "A0m", A0mstring, realvars, complexvars)
+    ReA[1,-1], ImA[1,-1] = string2RooFormulaVar("Apm", "Apm", Apmstring, realvars, complexvars)
+    ReA[-1,1], ImA[-1,1] = string2RooFormulaVar("Amp", "Amp", Ampstring, realvars, complexvars)
 
     #Phase space, eq. (6)
     P = ROOT.RooFormulaVar("P", "P",
@@ -202,7 +204,18 @@ def spin2():
                           )
 
     #final distribution, eq. (7)
-    pdf = ROOT.RooGenericPdf("pdf", "pdf", "(@0**2 + @1**2 + @2**2 + @3**2 + @4**2 + @5**2 + @6**2 + @7**2 + @8**2 + @9**2 + @10**2 + @11**2 + @12**2 + @13**2 + @14**2 + @15**2 + @16**2 + @17**2 + @18**2) * %19", ROOT.RooArgList(ReA00, ImA00, ReApp, ImApp, ReAmm, ImAmm, ReAp0, ImAp0, ReA0p, ImA0p, ReAm0, ImAm0, ReA0m, ImA0m, ReApm, ImApm, ReAmp, ImAmp, P))
+    tlist = ROOT.TList()
+    pdfformula = "("
+    i = 0
+    for amplitude in ReA.values() + ImA.values():
+        tlist.Add(amplitude)
+        if i > 0:
+            pdfformula += " + "
+        pdfformula += "@%i**2" % i
+        i += 1
+    tlist.Add(P)
+    pdfformula += ") * %i" % i
+    pdf = ROOT.RooGenericPdf("pdf", "pdf", pdfformula, ROOT.RooArgList(tlist))
 
     frame = m4l.frame()
     c1 = ROOT.TCanvas.MakeDefCanvas()
@@ -214,7 +227,7 @@ def spin2():
     c1.SaveAs("AnalyticMassShape_spin2.root")
 
 
-def string2formulavar(name, title, formula, realvars, complexvars):
+def string2RooFormulaVar(name, title, formula, realvars, complexvars):
     formula = formula.replace("\n", "")
     args = []
     index = 0
@@ -234,12 +247,12 @@ def string2formulavar(name, title, formula, realvars, complexvars):
         assert varname == imname.replace("Im", "")
         regex = r"\b" + varname + r"\b"
         regexi = r"\bi[*]" + varname + r"\b"
-        if re.search(regexi, realformula):
+        if re.search(regexi, reformula):
             reformula = re.sub(regexi, "@%i"%len(reargs), reformula)
             reargs.append(imvar)
             imformula = re.sub(regexi, "(-@%i)"%len(imargs), imformula)
             imargs.append(revar)
-        if re.search(regex, realformula):
+        if re.search(regex, reformula):
             reformula = re.sub(regex, "@%i"%len(reargs), reformula)
             reargs.append(revar)
             imformula = re.sub(regex, "@%i"%len(imargs), imformula)
@@ -252,7 +265,7 @@ def string2formulavar(name, title, formula, realvars, complexvars):
             ROOT.RooFormulaVar("Im"+name, "Im"+title, imformula, imarglist))
 
 def getparameters():
-    global decaymode, realconstants, complexconstants
+    global decaymode, spin, realconstants, complexconstants
 
     with open("../JHUGenerator/mod_Parameters.F90") as f:
         for line in f:
@@ -289,18 +302,18 @@ def getparameters():
         for constantname in complexconstants:
             if arg.split("=")[0] == constantname:
                 try:
-                    re = float(arg.split("=")[1].split(",")[0])
-                    im = float(arg.split("=")[1].split(",")[1])
-                    complexconstants[constantname] = re + im*1j
+                    Re = float(arg.split("=")[1].split(",")[0])
+                    Im = float(arg.split("=")[1].split(",")[1])
+                    complexconstants[constantname] = Re + Im*1j
                 except (ValueError, IndexError):
                     raise ValueError("Syntax: " + constantname + "=1.23,4.56")
                 success = True
         if arg.split("=")[0] == "decaymode":
             decaymode = arg.split("=")[1]
+            success = True
         if arg.split("=")[0] == "spin":
             spin = int(arg.split("=")[1])
-        if arg.split("=")[0] == "decaymode":
-            decaymode = arg.split("=")[1]
+            success = True
         if not success:
             raise ValueError("Unknown argument: " + arg)
 
