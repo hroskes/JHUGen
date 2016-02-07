@@ -62,12 +62,12 @@ def spin0():
     Ima3 = ROOT.RooFormulaVar("Ima3", "Ima3", "-2*@0", ROOT.RooArgList(Img4))
 
     #eq. (14)
-    ReA00 = ROOT.RooFormulaVar("ReA00", "ReA00", "-@0**2 * (@1*sqrt(1+@2) + @3*(@4*@5/@0**2)*@2)      ", ROOT.RooArgList(m4l, Rea1, x, Rea2, m1, m2))
-    ImA00 = ROOT.RooFormulaVar("ImA00", "ImA00", "-@0**2 * (@1*sqrt(1+@2) + @3*(@4*@5/@0**2)*@2)      ", ROOT.RooArgList(m4l, Ima1, x, Ima2, m1, m2))
-    ReApp = ROOT.RooFormulaVar("ReApp", "ReApp", " @0**2 * (@1            - @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Rea1, x, Ima3, m1, m2))
-    ImApp = ROOT.RooFormulaVar("ImApp", "ImApp", " @0**2 * (@1            + @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Ima1, x, Rea3, m1, m2))
-    ReAmm = ROOT.RooFormulaVar("ReAmm", "ReAmm", " @0**2 * (@1            + @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Rea1, x, Ima3, m1, m2))
-    ImAmm = ROOT.RooFormulaVar("ImAmm", "ImAmm", " @0**2 * (@1            - @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Ima1, x, Rea3, m1, m2))
+    ReA00 = ROOT.RooFormulaVar("ReA00_spin0", "ReA00_spin0", "-@0**2 * (@1*sqrt(1+@2) + @3*(@4*@5/@0**2)*@2)      ", ROOT.RooArgList(m4l, Rea1, x, Rea2, m1, m2))
+    ImA00 = ROOT.RooFormulaVar("ImA00_spin0", "ImA00_spin0", "-@0**2 * (@1*sqrt(1+@2) + @3*(@4*@5/@0**2)*@2)      ", ROOT.RooArgList(m4l, Ima1, x, Ima2, m1, m2))
+    ReApp = ROOT.RooFormulaVar("ReApp_spin0", "ReApp_spin0", " @0**2 * (@1            - @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Rea1, x, Ima3, m1, m2))
+    ImApp = ROOT.RooFormulaVar("ImApp_spin0", "ImApp_spin0", " @0**2 * (@1            + @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Ima1, x, Rea3, m1, m2))
+    ReAmm = ROOT.RooFormulaVar("ReAmm_spin0", "ReAmm_spin0", " @0**2 * (@1            + @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Rea1, x, Ima3, m1, m2))
+    ImAmm = ROOT.RooFormulaVar("ImAmm_spin0", "ImAmm_spin0", " @0**2 * (@1            - @3*(@4*@5/@0**2)*sqrt(@2))", ROOT.RooArgList(m4l, Ima1, x, Rea3, m1, m2))
 
     #Phase space, eq. (6)
     P = ROOT.RooFormulaVar("P", "P",
@@ -79,16 +79,20 @@ def spin0():
                           )
 
     #final distribution, eq. (7)
-    pdf = ROOT.RooGenericPdf("pdf", "pdf", "(@0**2 + @1**2 + @2**2 + @3**2 + @4**2 + @5**2) * @6", ROOT.RooArgList(ReA00, ImA00, ReApp, ImApp, ReAmm, ImAmm, P))
+    pdf = ROOT.RooGenericPdf("spin0pdf", "spin0pdf", "(@0**2 + @1**2 + @2**2 + @3**2 + @4**2 + @5**2) * @6", ROOT.RooArgList(ReA00, ImA00, ReApp, ImApp, ReAmm, ImAmm, P))
 
     frame = m4l.frame()
     c1 = ROOT.TCanvas.MakeDefCanvas()
-    pdf.createProjection(ROOT.RooArgSet(m1, m2)).plotOn(frame)
+    m4lshape = pdf.createProjection(ROOT.RooArgSet(m1, m2))
+    m4lshape.plotOn(frame)
     frame.Draw()
     c1.SaveAs("AnalyticMassShape.png")
     c1.SaveAs("AnalyticMassShape.eps")
     c1.SaveAs("AnalyticMassShape.pdf")
     c1.SaveAs("AnalyticMassShape.root")
+    w = ROOT.RooWorkspace("workspace", "workspace")
+    getattr(w, 'import')(m4lshape)
+    w.writeToFile("AnalyticMassShape_workspace.root")
 
 
 def spin2():
@@ -184,15 +188,15 @@ def spin2():
     complexvars = [(Rec1, Imc1), (Rec2, Imc2), (Rec41, Imc41), (Rec42, Imc42)]
     ReA = {}
     ImA = {}
-    ReA[0,0], ImA[0,0] = string2RooFormulaVar("A00", "A00", A00string, realvars, complexvars)
-    ReA[1,1], ImA[1,1] = string2RooFormulaVar("App", "App", Appstring, realvars, complexvars)
-    ReA[-1,-1], ImA[-1,-1] = string2RooFormulaVar("Amm", "Amm", Ammstring, realvars, complexvars)
-    ReA[1,0], ImA[1,0] = string2RooFormulaVar("Ap0", "Ap0", Ap0string, realvars, complexvars)
-    ReA[0,1], ImA[0,1] = string2RooFormulaVar("A0p", "A0p", A0pstring, realvars, complexvars)
-    ReA[-1,0], ImA[-1,0] = string2RooFormulaVar("Am0", "Am0", Am0string, realvars, complexvars)
-    ReA[0,-1], ImA[0,-1] = string2RooFormulaVar("A0m", "A0m", A0mstring, realvars, complexvars)
-    ReA[1,-1], ImA[1,-1] = string2RooFormulaVar("Apm", "Apm", Apmstring, realvars, complexvars)
-    ReA[-1,1], ImA[-1,1] = string2RooFormulaVar("Amp", "Amp", Ampstring, realvars, complexvars)
+    ReA[0,0], ImA[0,0] = string2RooFormulaVar("A00_spin2", "A00_spin2", A00string, realvars, complexvars)
+    ReA[1,1], ImA[1,1] = string2RooFormulaVar("App_spin2", "App_spin2", Appstring, realvars, complexvars)
+    ReA[-1,-1], ImA[-1,-1] = string2RooFormulaVar("Amm_spin2", "Amm_spin2", Ammstring, realvars, complexvars)
+    ReA[1,0], ImA[1,0] = string2RooFormulaVar("Ap0_spin2", "Ap0_spin2", Ap0string, realvars, complexvars)
+    ReA[0,1], ImA[0,1] = string2RooFormulaVar("A0p_spin2", "A0p_spin2", A0pstring, realvars, complexvars)
+    ReA[-1,0], ImA[-1,0] = string2RooFormulaVar("Am0_spin2", "Am0_spin2", Am0string, realvars, complexvars)
+    ReA[0,-1], ImA[0,-1] = string2RooFormulaVar("A0m_spin2", "A0m_spin2", A0mstring, realvars, complexvars)
+    ReA[1,-1], ImA[1,-1] = string2RooFormulaVar("Apm_spin2", "Apm_spin2", Apmstring, realvars, complexvars)
+    ReA[-1,1], ImA[-1,1] = string2RooFormulaVar("Amp_spin2", "Amp_spin2", Ampstring, realvars, complexvars)
 
     #Phase space, eq. (6)
     P = ROOT.RooFormulaVar("P", "P",
@@ -215,16 +219,20 @@ def spin2():
         i += 1
     tlist.Add(P)
     pdfformula += ") * %i" % i
-    pdf = ROOT.RooGenericPdf("pdf", "pdf", pdfformula, ROOT.RooArgList(tlist))
+    pdf = ROOT.RooGenericPdf("spin2pdf", "spin2pdf", pdfformula, ROOT.RooArgList(tlist))
 
     frame = m4l.frame()
     c1 = ROOT.TCanvas.MakeDefCanvas()
-    pdf.createProjection(ROOT.RooArgSet(m1, m2)).plotOn(frame)
+    m4lshape = pdf.createProjection(ROOT.RooArgSet(m1, m2))
+    m4lshape.plotOn(frame)
     frame.Draw()
     c1.SaveAs("AnalyticMassShape_spin2.png")
     c1.SaveAs("AnalyticMassShape_spin2.eps")
     c1.SaveAs("AnalyticMassShape_spin2.pdf")
     c1.SaveAs("AnalyticMassShape_spin2.root")
+    w = ROOT.RooWorkspace("workspace", "workspace")
+    getattr(w, 'import')(m4lshape)
+    w.writeToFile("AnalyticMassShape_spin2_workspace.root")
 
 
 def string2RooFormulaVar(name, title, formula, realvars, complexvars):
