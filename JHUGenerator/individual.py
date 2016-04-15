@@ -33,7 +33,6 @@ def function():
                         c.SaveAs(e)
                         c.SaveAs(f)
                     c = ROOT.TCanvas()
-                    print glist
                     mg.Draw("APEZ")
                     l.Draw()
                     d = a + ".png"
@@ -84,6 +83,10 @@ def mass(a,b):
                      denom += 1/(width*width)
             dictarea[m] = num/denom
             dicterror[m] = 1/(denom**0.5)
+        area125 = dictarea[125]
+        for m in Hmasses:
+           dictarea[m] /= area125
+           dicterror[m] /= area125
         return dictarea, dicterror
 
 function()    
