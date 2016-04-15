@@ -1,0 +1,52 @@
+for a in VBF ZH WH HJJ; do
+for b in SM g2 g4 L1; do
+if [ $a == HJJ ]; then
+
+  if [ $b == g2 ] || [ $b == L1 ]; then
+    continue
+  elif [ $b == SM ]; then
+    moreparameters='Process=61 ghg2=1,0'
+  elif [ $b == g4 ]; then
+    moreparameters='Process=61 ghg2=0,0 ghg4=1,0'
+  fi
+
+else
+
+ if [ $b == SM ]; then
+    moreparameters='ghz1=1,0'
+ elif [ $b == g2 ]; then
+    moreparameters='ghz1=0,0 ghz2=1,0'
+  elif [ $b == g4 ]; then
+    moreparameters='ghz1=0,0 ghz4=1,0'
+elif [ $b == L1 ]; then
+    moreparameters='ghz1=0,0 ghz1_prime2=1,0'
+  fi
+
+  if [ $a == VBF ]; then
+    moreparameters="$moreparameters Process=60 pTjetcut=0 deltaRcut=0"
+  elif [ $a == ZH ]; then
+    moreparameters="$moreparameters Process=50 DecayMode1=9"
+  elif [ $a == WH ]; then
+    moreparameters="$moreparameters Process=50 DecayMode1=11"
+fi
+fi
+HMASSBEGIN=70
+HMASS=$HMASSBEGIN
+while true; do
+if [ $HMASS -gt 3000 ];then
+ break
+fi
+if ! [ -f $(pwd)/$a/$b/m$HMASS.out ]; then sbatch -o $(pwd)/$a/$b/m$HMASS.out -e $(pwd)/$a/$b/m$HMASS.out --job-name=$a$b$HMASS template.slurm.sh $HMASS "$moreparameters";
+fi
+if [ $HMASS -lt 500 ];then
+ let HMASS=$HMASS+2
+elif [ $HMASS -lt 1000 ];then
+ let HMASS=$HMASS+5
+elif [ $HMASS -lt 1500 ];then
+ let HMASS=$HMASS+10
+else
+ let HMASS=$HMASS+50
+fi
+done
+done
+done
