@@ -1,6 +1,7 @@
 import ROOT
 import style
 from array import array
+from collections import OrderedDict
 def function():
         for a in "VBF", "HJJ", "ZH", "WH":
                     glist = []
@@ -30,7 +31,8 @@ def function():
                         e = a + b + ".root"
                         f = a + b + ".pdf"
                         c.SaveAs(d)
-                        c.SaveAs(e)
+                        tfile = ROOT.TFile(e, "recreate")
+                        g.Write()
                         c.SaveAs(f)
                     c = ROOT.TCanvas()
                     mg.Draw("APEZ")
@@ -57,12 +59,12 @@ def hmass():
               HMASS += 10
            else:
               HMASS += 50
-        return masses
+        return sorted(masses)
 
 def mass(a,b):
         
-        dictarea = {}
-        dicterror = {}
+        dictarea = OrderedDict()
+        dicterror = OrderedDict()
         Hmasses = hmass()
         for m in Hmasses:
 	    area = 0
@@ -84,9 +86,9 @@ def mass(a,b):
             dictarea[m] = num/denom
             dicterror[m] = 1/(denom**0.5)
         area125 = dictarea[125]
-        for m in Hmasses:
-           dictarea[m] /= area125
-           dicterror[m] /= area125
+        #for m in Hmasses:
+        #   dictarea[m] /= area125
+        #   dicterror[m] /= area125
         return dictarea, dicterror
 
 function()    
