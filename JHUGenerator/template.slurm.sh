@@ -7,7 +7,7 @@
 #SBATCH --mem=3000
 
 . /work-zfs/lhc/cms/cmsset_default.sh
-cd /scratch/groups/lhc/park/CMSSW_7_6_3/
+cd ~/CMSSW_7_6_3/
 eval $(scram ru -sh)
 if [ ${SLURM_SUBMIT_DIR} ]; then cd ${SLURM_SUBMIT_DIR}; else cd - > /dev/null; fi || exit $?
 echo "SLURM job running in: " `pwd`
