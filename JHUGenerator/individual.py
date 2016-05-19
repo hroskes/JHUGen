@@ -1,19 +1,21 @@
+import os
 import ROOT
 import style
 from array import array
 from collections import OrderedDict
 def function():
-        for a in "VBF", "HJJ", "ZH", "WH":
+        for a in "VBF", "HJJ", "ZH", "WH", "spin2":
                     glist = []
                     mg = ROOT.TMultiGraph("mg", "mg")
                     l = ROOT.TLegend(.6, .7, .9, .9)
                     l.SetFillStyle(0)
                     l.SetBorderSize(0)
                     color = 1
-                    for b in "SM", "g2", "g4", "L1":
-                        if a == "HJJ" and (b == "g2" or b == "L1"):
+                    for b in "SM", "g2", "g4", "L1", "2bplus"::
+                        if a == "HJJ" and (b == "g2" or b == "L1") or ((a == "spin2") != (b == "2bplus")):
                                     continue
                         dictarea, dicterror =  mass(a,b)
+                        if not dictarea: continue
                         x = array("d", dictarea.keys())
                         y = array("d", dictarea.values())
                         errx = array ("d", [0] * len(dicterror))
@@ -85,7 +87,7 @@ def mass(a,b):
                      denom += 1/(width*width)
             dictarea[m] = num/denom
             dicterror[m] = 1/(denom**0.5)
-        area125 = dictarea[125]
+        #area125 = dictarea[125]
         #for m in Hmasses:
         #   dictarea[m] /= area125
         #   dicterror[m] /= area125
