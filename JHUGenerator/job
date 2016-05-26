@@ -2,7 +2,7 @@ for a in VBF ZH WH HJJ; do
 for b in SM g2 g4 L1; do
 for cut in '' 'pTjetcut=25 etajetcut=4.7 pTlepcut=5 etalepcut=2.5'; do
 
-if ! [ "$cut" ]; then continue; fi
+if [ $cut ]; then continue; fi
 
 if [ $a == HJJ ]; then
 
