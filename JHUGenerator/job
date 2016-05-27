@@ -1,8 +1,12 @@
-for a in VBF ZH WH HJJ; do
-for b in SM g2 g4 L1; do
+for a in VBF ZH WH HJJ spin2_gg spin0; do
+for b in SM g2 g4 L1 2bplus 0plus; do
 for cut in '' 'pTjetcut=25 etajetcut=4.7 pTlepcut=5 etalepcut=2.5'; do
 
-if [ $cut ]; then continue; fi
+if [ "$cut" ]; then continue; fi
+
+if ([ $a == spin2_gg ] && ! [ $b == 2bplus ]) || (! [ $a == spin2_gg ] && [ $b == 2bplus ]); then continue; fi
+if ([ $a == spin0 ] && ! [ $b == 0plus ]) || (! [ $a == spin0 ] && [ $b == 0plus ]); then continue; fi
+if ([ $a == spin2_gg ] || [ $a == spin0 ]) && [ "$cut" ]; then continue; fi
 
 if [ $a == HJJ ]; then
 
@@ -22,8 +26,12 @@ else
     moreparameters='ghz1=0,0 ghz2=1,0'
   elif [ $b == g4 ]; then
     moreparameters='ghz1=0,0 ghz4=1,0'
-elif [ $b == L1 ]; then
+  elif [ $b == L1 ]; then
     moreparameters='ghz1=0,0 ghz1_prime2=1,0'
+  elif [ $b == 2bplus ]; then
+    moreparameters='a1=1,0 b5=1,0'
+  elif [ $b == 0plus ]; then
+    moreparameters='ghz1=1,0'
   fi
 
   if [ $a == VBF ]; then
@@ -32,7 +40,11 @@ elif [ $b == L1 ]; then
     moreparameters="$moreparameters Process=50 DecayMode1=9 $cut"
   elif [ $a == WH ]; then
     moreparameters="$moreparameters Process=50 DecayMode1=11 $cut"
-fi
+  elif [ $a == spin2_gg ]; then
+    moreparameters="$moreparameters Process=2 PChannel=0 Interf=0"
+  elif [ $a == spin0 ]; then
+    moreparameters="$moreparameters Process=0 PChannel=0 Interf=0"
+  fi
 fi
 HMASSBEGIN=70
 HMASS=$HMASSBEGIN
