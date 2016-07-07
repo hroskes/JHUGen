@@ -1,6 +1,16 @@
 import re
+import sys
 import ROOT
 import sys
+
+def getCommandOutput2(command):
+    child = os.popen(command)
+    data = child.read()
+    err = child.close()
+    if err:
+        raise RuntimeError('%s failed with exit code %d' % (command, err))
+    return data
+
 
 #==================================
 #parameters
@@ -14,9 +24,9 @@ realconstants = {
                  "Ga_W": None,
                 }
 complexconstants = {
-                    "ghz1": None,
-                    "ghz2": None,
-                    "ghz4": None,
+                    "ghz1": 0+0j,
+                    "ghz2": 1+0j,
+                    "ghz4": 0+0j,
                     "b1": None,
                     "b5": None,
                    }
@@ -24,12 +34,15 @@ complexconstants = {
 #../JHUgenerator/mod_Parameters.F90
 
 m4lmin = 60
-m4lmax = 1000
+m4lmax = 1500
 #==================================
 
 #http://arxiv.org/pdf/1208.4018v3.pdf
 
-def spin0():
+def makeplot(plotdir, m4lmin, m4lmax, decaymode, textfile, nbins, plotsuffix):
+    spin0(plotdir, m4lmin, m4lmax, decaymode, textfile, nbins, plotsuffix)
+
+def spin0(plotdir, m4lmin, m4lmax, decaymode, textfile, nbins, plotsuffix):
     #define RooConstVars
     mV = ROOT.RooConstVar("mV", "mV", realconstants["M_%s"%decaymode])
     gammaV = ROOT.RooConstVar("gammaV", "gammaV", realconstants["Ga_%s"%decaymode])
@@ -81,15 +94,34 @@ def spin0():
     #final distribution, eq. (7)
     pdf = ROOT.RooGenericPdf("spin0pdf", "spin0pdf", "(@0**2 + @1**2 + @2**2 + @3**2 + @4**2 + @5**2) * @6", ROOT.RooArgList(ReA00, ImA00, ReApp, ImApp, ReAmm, ImAmm, P))
 
+    h = ROOT.TH1F("h", "h", nbins, m4lmin, m4lmax)
+    with open(textfile) as f:
+        for line in f:
+            try:
+                data = [float(a) for a in line.split()]
+                h.Fill(data[0], data[1])
+            except (IndexError, ValueError):
+                continue
+    datahist = ROOT.RooDataHist("datahist", "datahist", ROOT.RooArgList(m4l), h)
+    histpdf = ROOT.RooHistPdf("histpdf", "histpdf", ROOT.RooArgSet(m4l), datahist)
+
     frame = m4l.frame()
     c1 = ROOT.TCanvas.MakeDefCanvas()
     m4lshape = pdf.createProjection(ROOT.RooArgSet(m1, m2))
     m4lshape.plotOn(frame)
+    histpdf.plotOn(frame, ROOT.RooFit.LineColor(2))
     frame.Draw()
-    c1.SaveAs("AnalyticMassShape.png")
-    c1.SaveAs("AnalyticMassShape.eps")
-    c1.SaveAs("AnalyticMassShape.pdf")
-    c1.SaveAs("AnalyticMassShape.root")
+    c1.SaveAs(plotdir+"/AnalyticMassShape%s.png"%plotsuffix)
+    c1.SaveAs(plotdir+"/AnalyticMassShape%s.eps"%plotsuffix)
+    c1.SaveAs(plotdir+"/AnalyticMassShape%s.pdf"%plotsuffix)
+    c1.SaveAs(plotdir+"/AnalyticMassShape%s.root"%plotsuffix)
+
+    c1.SetLogy()
+    c1.SaveAs(plotdir+"/AnalyticMassShape_log%s.png"%plotsuffix)
+    c1.SaveAs(plotdir+"/AnalyticMassShape_log%s.eps"%plotsuffix)
+    c1.SaveAs(plotdir+"/AnalyticMassShape_log%s.pdf"%plotsuffix)
+    c1.SaveAs(plotdir+"/AnalyticMassShape_log%s.root"%plotsuffix)
+
     w = ROOT.RooWorkspace("workspace", "workspace")
     getattr(w, 'import')(m4lshape)
     w.writeToFile("AnalyticMassShape_workspace.root")
@@ -298,7 +330,7 @@ def getparameters():
                         imag = result.group(2).replace("d","e").replace("D","E")
                         complexconstants[constantname] = float(real)+1j*float(imag)
 
-    for arg in sys.argv[1:]:
+    for arg in sys.argv[2:]:
         success = False
         for constantname in realconstants:
             if arg.split("=")[0] == constantname:
@@ -334,11 +366,24 @@ def getparameters():
     if decaymode not in ("Z", "W"):
         raise ValueError("Invalid decay mode!  Needs to be Z or W.")
 
+
 if __name__ == '__main__':
     getparameters()
-    if spin == 0:
-        spin0()
-    elif spin == 2:
-        spin2()
-    else:
-        raise ValueError("Spin must be 0 or 2!")
+    which = int(sys.argv[1])
+    hypothesis = "a2"
+    if which == 1:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,    0, 1000, "Z", "data_%s.txt"%hypothesis, 200, "_0-1000")
+    if which == 2:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,    0,  200, "Z", "data_%s.txt"%hypothesis,  40, "_0-200")
+    if which == 3:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,  200,  400, "Z", "data_%s.txt"%hypothesis,  40, "_200-400")
+    if which == 4:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,  400,  600, "Z", "data_%s.txt"%hypothesis,  40, "_400-600")
+    if which == 5:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,  600,  800, "Z", "data_%s.txt"%hypothesis,  40, "_600-800")
+    if which == 6:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,  800, 1000, "Z", "data_%s.txt"%hypothesis,  40, "_800-1000")
+    if which == 7:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,    0,  100, "Z", "data_%s.txt"%hypothesis,  20, "_0-100")
+    if which == 8:
+        makeplot("/afs/cern.ch/user/h/hroskes/www/JHUgen/AnalyticMassShape/%s/"%hypothesis,    0,   50, "Z", "data_%s.txt"%hypothesis,  10, "_0-50")
