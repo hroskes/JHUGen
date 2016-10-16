@@ -1,4 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from array import array
+from collections import OrderedDict
 import errno
 import os
 import pipes
@@ -16,18 +18,6 @@ def mkdir_p(path):
             pass
         else:
             raise
-
-@call
-def masses():
-    result = []
-    for m in range(70, 500, 2): result.append(m)
-    for m in range(500, 1000, 5): result.append(m)
-    for m in range(1000, 1500, 10): result.append(m)
-    for m in range(1500, 3000, 50): result.append(m)
-    result.append(125)
-    result.append(3000)
-    result.sort()
-    return result
 
 @call
 def allarguments():
@@ -75,13 +65,10 @@ def submit_job(outdir, jobbasename, MReso, **kwargs):
     if jobname in bjobs.split():
         return
 
-    subprocess.check_call(["sbatch", "-o", outfile, "-e", outfile, "--job-name", jobname, "template.slurm.sh", str(MReso), otherargs])
+    print jobname
+#    subprocess.check_call(["sbatch", "-o", outfile, "-e", outfile, "--job-name", jobname, "template.slurm.sh", str(MReso), otherargs])
 
-def submit_masses(outdir, jobbasename, masses, **kwargs):
-    for mass in masses:
-        submit_job(outdir, jobbasename, mass, **kwargs)
-
-class XsecScanBase(object):
+class XsecBase(object):
     __metaclass__ = ABCMeta
     @abstractproperty
     def outdir(self):
@@ -92,16 +79,141 @@ class XsecScanBase(object):
     @abstractproperty
     def kwargs(self):
         pass
-    def submit_masses(self):
-        submit_masses(self.outdir, self.jobbasename, masses, **self.kwargs)
+    def submit_job(self):
+        submit_job(self.outdir, self.jobbasename, self.MReso, **self.kwargs)
 
-class XsecScanProcessCouplings(XsecScanBase):
-    def __init__(self, process, coupling, usecut=False):
+    def xsec(self):
+        filename = os.path.join(self.outdir, "m{}.out".format(self.MReso))
+        try:
+            num = denom = 0
+            with open(filename) as f:
+                for line in f:
+                    if "integral" in line:
+                        xsec  = float(line.split()[3])
+                    if "std. dev" in line:
+                        error  = float(line.split()[4])
+                        num += xsec/(error*error)
+                        denom += 1/(error*error)
+            return num/denom, 1/(denom**0.5)
+        except IOError:
+            return None, None
+
+
+class XsecScanBase(object):
+    __metaclass__ = ABCMeta
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        assert "MReso" not in kwargs
+
+    def submit_masses(self):
+        for mass in self.masses():
+            self.individualjob(mass).submit_job()
+
+    def individualjob(self, mass):
+        kwargs = self.kwargs.copy()
+        kwargs["MReso"] = mass
+        return self.individualjobclass(*self.args, **kwargs)
+
+    @abstractproperty
+    def individualjobclass(self):
+        pass
+
+    @staticmethod
+    def masses():
+        result = []
+        for m in range(70, 500, 2): result.append(m)
+        for m in range(500, 1000, 5): result.append(m)
+        for m in range(1000, 1500, 10): result.append(m)
+        for m in range(1500, 3000, 50): result.append(m)
+        result.append(125)
+        result.append(3000)
+        result.sort()
+        return result
+
+    @abstractproperty
+    def legendtitle(self):
+        pass
+    @abstractproperty
+    def color(self):
+        pass
+
+    @property
+    def outdir(self):
+        assert self.individualjob(125).outdir == self.individualjob(3000).outdir
+        return self.individualjob(125).outdir
+    @property
+    def jobbasename(self):
+        assert self.individualjob(125).jobbasename == self.individualjob(3000).jobbasename
+        return self.individualjob(125).jobbasename
+
+    def drawtgraph(self):
+        xsecs = OrderedDict()
+        errors = OrderedDict()
+        for mass in self.masses():
+            xsec, error = self.individualjob(mass).xsec()
+            if xsec is not None is not error:
+                xsecs[mass], errors[mass] = xsec, error
+
+        if not xsecs: return None
+
+        x = array("d", xsecs.keys())
+        y = array("d", xsecs.values())
+        errx = array ("d", [0] * len(errors))
+        erry = array("d", errors.values())
+        assert len(x) == len(y) == len(errx) == len(erry)
+
+        import ROOT
+        import style
+        g = ROOT.TGraphErrors(len(x), x, y, errx, erry)
+        g.SetMarkerColor(self.color)
+        g.SetLineColor(self.color)
+        c = ROOT.TCanvas()
+        g.Draw("APEZ")
+        for ext in "png eps pdf".split():
+            c.SaveAs("{}.{}".format(self.jobbasename, ext))
+        f = ROOT.TFile("{}.{}".format(self.jobbasename, "root"), "RECREATE")
+        f.cd()
+        g.Write()
+        return g
+
+class XsecScanGroupBase(object):
+    __metaclass__ = ABCMeta
+
+    @abstractproperty
+    def scans(self):
+        pass
+    @abstractproperty
+    def saveasname(self):
+        pass                
+
+    def drawtmultigraph(self):
+        import ROOT
+        import style
+        mg = ROOT.TMultiGraph("mg", "mg")
+        l = ROOT.TLegend(.6, .7, .9, .9)
+        l.SetFillStyle(0)
+        l.SetBorderSize(0)
+        graphs = {_: _.drawtgraph() for _ in self.scans}
+        for scan, g in graphs.iteritems():
+            if g is None: continue
+            mg.Add(g)
+            l.AddEntry(g, scan.legendtitle, "lpf")
+        c = ROOT.TCanvas()
+        mg.Draw("APEZ")
+        for ext in "png eps root pdf".split():
+            c.SaveAs("{}.{}".format(self.saveasname, ext))
+        return mg
+
+class XsecProcessCouplings(XsecBase):
+    def __init__(self, process, coupling, usecut=False, MReso=None):
         self.process = process
         self.coupling = coupling
         self.usecut = usecut
-        if coupling not in self.allowedcouplings(process):
-            raise ValueError("Bad coupling {} for process {}".format(coupling, process))
+        if self.coupling not in self.allowedcouplings(self.process):
+            raise ValueError("Bad coupling {} for process {}".format(self.coupling, self.process))
+        assert MReso is not None
+        self.MReso = MReso
     @property
     def kwargs(self):
         result = {"Process": self.processid}
@@ -163,10 +275,54 @@ class XsecScanProcessCouplings(XsecScanBase):
         if process in ["HJJ", "VBF", "ZH", "WH"]: return True
         assert False
 
+
+
+class XsecScanProcessCouplings(XsecScanBase):
+    individualjobclass = XsecProcessCouplings
+
+    @classmethod
+    def allowedcouplings(cls, *args, **kwargs):
+        return cls.individualjobclass.allowedcouplings(*args, **kwargs)
+
+    @classmethod
+    def cancut(cls, *args, **kwargs):
+        return cls.individualjobclass.cancut(*args, **kwargs)
+
+    @property
+    def process(self):
+        return self.individualjob(125).process
+    @property
+    def coupling(self):
+        return self.individualjob(125).coupling
+
+    @property
+    def legendtitle(self):
+        return self.coupling
+    @property
+    def color(self):
+        if self.coupling == "SM": return 1
+        if self.coupling == "g2": return 2
+        if self.coupling == "g4": return 3
+        if self.coupling == "L1": return 4
+        assert False
+
+class XsecScanGroupProcess(XsecScanGroupBase):
+    def __init__(self, process):
+        self.process = process
+
+    @property
+    def scans(self):
+        return [XsecScanProcessCouplings(self.process, _) for _ in XsecScanProcessCouplings.allowedcouplings(self.process)]
+
+    @property
+    def saveasname(self):
+        return self.process
+
+
 if __name__ == "__main__":
     for process in "HZZ2e2mu", "VBF", "HJJ", "ZH", "WH":
-        for couplings in XsecScanProcessCouplings.allowedcouplings(process):
-            XsecScanProcessCouplings(process, couplings, False).submit_masses()
-            if XsecScanProcessCouplings.cancut(process):
-                XsecScanProcessCouplings(process, couplings, True).submit_masses()
-
+#        for couplings in XsecScanProcessCouplings.allowedcouplings(process):
+#            XsecScanProcessCouplings(process, couplings, False).submit_masses()
+#            if XsecScanProcessCouplings.cancut(process):
+#                XsecScanProcessCouplings(process, couplings, True).submit_masses()
+        XsecScanGroupProcess(process).drawtmultigraph()
