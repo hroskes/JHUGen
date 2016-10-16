@@ -75,8 +75,7 @@ def submit_job(outdir, jobbasename, MReso, **kwargs):
     if jobname in bjobs.split():
         return
 
-    print jobname
-    #subprocess.check_call(["sbatch", "-o", outfile, "-e", outfile, "--job-name", jobname, "template.slurm.sh", str(MReso), otherargs])
+    subprocess.check_call(["sbatch", "-o", outfile, "-e", outfile, "--job-name", jobname, "template.slurm.sh", str(MReso), otherargs])
 
 def submit_masses(outdir, jobbasename, masses, **kwargs):
     for mass in masses:
