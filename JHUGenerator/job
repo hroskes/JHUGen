@@ -1,11 +1,9 @@
 for a in VBF ZH WH HJJ spin2_gg spin0; do
-for b in SM g2 g4 L1 2bplus 0plus; do
+for b in SM g2 g4 L1 2bplus; do
 for cut in '' 'pTjetcut=25 etajetcut=4.7 pTlepcut=5 etalepcut=2.5'; do
 
-if [ "$cut" ]; then continue; fi
-
 if ([ $a == spin2_gg ] && ! [ $b == 2bplus ]) || (! [ $a == spin2_gg ] && [ $b == 2bplus ]); then continue; fi
-if ([ $a == spin0 ] && ! [ $b == 0plus ]) || (! [ $a == spin0 ] && [ $b == 0plus ]); then continue; fi
+if ([ $a == spin0 ] && ! [ $b == SM ]); then continue; fi
 if ([ $a == spin2_gg ] || [ $a == spin0 ]) && [ "$cut" ]; then continue; fi
 
 if [ $a == HJJ ]; then
@@ -30,8 +28,6 @@ else
     moreparameters='ghz1=0,0 ghz1_prime2=1,0'
   elif [ $b == 2bplus ]; then
     moreparameters='a1=1,0 b5=1,0'
-  elif [ $b == 0plus ]; then
-    moreparameters='ghz1=1,0'
   fi
 
   if [ $a == VBF ]; then
@@ -50,15 +46,17 @@ HMASSBEGIN=70
 HMASS=$HMASSBEGIN
 while true; do
 if [ $HMASS -gt 3000 ];then
- break
+ HMASS=125
 fi
 bfordir="$b"
 if [ "$cut" ]; then bfordir="${b}_withcut"; fi
 mkdir -p $a/$bfordir
-if ! [ -f $(pwd)/$a/$bfordir/m$HMASS.out ]; then
+if ! [ -f $(pwd)/$a/$bfordir/m$HMASS.out ] && ! bjobs | grep -q $a$bfordir$HMASS; then
   sbatch -o $(pwd)/$a/$bfordir/m$HMASS.out -e $(pwd)/$a/$bfordir/m$HMASS.out --job-name=$a$bfordir$HMASS template.slurm.sh $HMASS "$moreparameters";
 fi
-if [ $HMASS -lt 500 ];then
+if [ $HMASS -eq 125 ]; then
+  break
+elif [ $HMASS -lt 500 ];then
  let HMASS=$HMASS+2
 elif [ $HMASS -lt 1000 ];then
  let HMASS=$HMASS+5

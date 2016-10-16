@@ -4,18 +4,18 @@ import style
 from array import array
 from collections import OrderedDict
 def function():
-        for a in "VBF", "HJJ", "ZH", "WH", "spin2":
+        for a in "VBF", "HJJ", "ZH", "WH", "spin2_gg":
                     glist = []
                     mg = ROOT.TMultiGraph("mg", "mg")
                     l = ROOT.TLegend(.6, .7, .9, .9)
                     l.SetFillStyle(0)
                     l.SetBorderSize(0)
                     color = 1
-                    for b in "SM", "g2", "g4", "L1", "2bplus"::
-                        if a == "HJJ" and (b == "g2" or b == "L1") or ((a == "spin2") != (b == "2bplus")):
+                    for b in "SM", "g2", "g4", "L1", "2bplus", "SM_withcut", "g2_withcut", "g4_withcut", "L1_withcut":
+                        if a == "HJJ" and (b == "g2" or b == "L1") or ((a == "spin2_gg") != (b == "2bplus")):
                                     continue
                         dictarea, dicterror =  mass(a,b)
-                        if not dictarea: continue
+                        if not dictarea: print a, b; continue
                         x = array("d", dictarea.keys())
                         y = array("d", dictarea.values())
                         errx = array ("d", [0] * len(dicterror))
