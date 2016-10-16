@@ -1,5 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=serial-job
 #SBATCH --time=48:0:0
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
