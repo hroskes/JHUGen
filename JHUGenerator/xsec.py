@@ -61,16 +61,13 @@ def submit_job(outdir, jobbasename, MReso, **kwargs):
     outfile = os.path.join(os.getcwd(), outdir, "m{}.out".format(MReso))
     if os.path.exists(outfile):
         return
-    print "m{}.out".format(MReso)
-    os.listdir(outdir)
-    assert False
     jobname = "{}_{}".format(jobbasename, MReso)
     bjobs = subprocess.check_output(["bjobs"])
     if jobname in bjobs.split():
         return
 
-    print jobname
-#    subprocess.check_call(["sbatch", "-o", outfile, "-e", outfile, "--job-name", jobname, "template.slurm.sh", str(MReso), otherargs])
+    print jobname, otherargs
+    subprocess.check_call(["sbatch", "-o", outfile, "-e", outfile, "--job-name", jobname, "template.slurm.sh", str(MReso), otherargs])
 
 class XsecBase(object):
     __metaclass__ = ABCMeta
@@ -235,6 +232,8 @@ class XsecProcessCouplings(XsecBase):
             elif self.coupling == "g2": return {"ghz1": 0, "ghz2": 1}
             elif self.coupling == "g4": return {"ghz1": 0, "ghz4": 1}
             elif self.coupling == "L1": return {"ghz1": 0, "ghz1_prime2": 1}
+            elif self.coupling == "SM_photoncut": return {"ghz1": 1, "ghzgs2": 0}
+            elif self.coupling == "L1Zgs": return {"ghz1": 0, "ghzgs1_prime2": 1}
         assert False
     @property
     def processid(self):
@@ -256,6 +255,9 @@ class XsecProcessCouplings(XsecBase):
         if self.process == "HZZ" and self.usecut: raise ValueError("Can't run {} with cut!".format(self.process))
         result = {}
         if self.process == "VBF": result.update(pTjetcut=0, deltaRcut=0)
+        if self.coupling in ["L1Zgs", "SM_photoncut"]:
+            if self.process == "VBF": result.update(pTjetcut=15)
+            else:                     result.update(MPhotonCutoff=4)
         if self.usecut: result.update(pTjetcut=25, etajetcut=4.7, pTlepcut=5, etalepcut=2.5)
         return result
     @property
@@ -267,15 +269,18 @@ class XsecProcessCouplings(XsecBase):
 
     @staticmethod
     def allowedcouplings(process):
-        if process in ["HZZ2e2mu", "VBF", "ZH", "WH"]:
+        if process in ["HZZ2e2mu", "VBF", "ZH"]:
+            return ["SM" ,"g2", "g4", "L1", "L1Zgs", "SM_photoncut"]
+        if process in ["WH"]:
             return ["SM" ,"g2", "g4", "L1"]
         if process == "HJJ":
             return ["SM", "g4"]
         raise ValueError("Bad process {}!".format(process))
 
     @staticmethod
-    def cancut(process):
+    def cancut(process, coupling):
         if process == "HZZ2e2mu": return False
+        if process == "VBF" and coupling == "SM_photoncut": return False
         if process in ["HJJ", "VBF", "ZH", "WH"]: return True
         assert False
 
@@ -327,6 +332,6 @@ if __name__ == "__main__":
     for process in "HZZ2e2mu", "VBF", "HJJ", "ZH", "WH":
         for couplings in XsecScanProcessCouplings.allowedcouplings(process):
             XsecScanProcessCouplings(process, couplings, False).submit_masses()
-            if XsecScanProcessCouplings.cancut(process):
+            if XsecScanProcessCouplings.cancut(process, couplings):
                 XsecScanProcessCouplings(process, couplings, True).submit_masses()
 #        XsecScanGroupProcess(process).drawtmultigraph()
