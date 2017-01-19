@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from abc import ABCMeta, abstractmethod, abstractproperty
 from array import array
 from collections import OrderedDict
@@ -60,6 +61,9 @@ def submit_job(outdir, jobbasename, MReso, **kwargs):
     outfile = os.path.join(os.getcwd(), outdir, "m{}.out".format(MReso))
     if os.path.exists(outfile):
         return
+    print "m{}.out".format(MReso)
+    os.listdir(outdir)
+    assert False
     jobname = "{}_{}".format(jobbasename, MReso)
     bjobs = subprocess.check_output(["bjobs"])
     if jobname in bjobs.split():
@@ -321,8 +325,8 @@ class XsecScanGroupProcess(XsecScanGroupBase):
 
 if __name__ == "__main__":
     for process in "HZZ2e2mu", "VBF", "HJJ", "ZH", "WH":
-#        for couplings in XsecScanProcessCouplings.allowedcouplings(process):
-#            XsecScanProcessCouplings(process, couplings, False).submit_masses()
-#            if XsecScanProcessCouplings.cancut(process):
-#                XsecScanProcessCouplings(process, couplings, True).submit_masses()
-        XsecScanGroupProcess(process).drawtmultigraph()
+        for couplings in XsecScanProcessCouplings.allowedcouplings(process):
+            XsecScanProcessCouplings(process, couplings, False).submit_masses()
+            if XsecScanProcessCouplings.cancut(process):
+                XsecScanProcessCouplings(process, couplings, True).submit_masses()
+#        XsecScanGroupProcess(process).drawtmultigraph()

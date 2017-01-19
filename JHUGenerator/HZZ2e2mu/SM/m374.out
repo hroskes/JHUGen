@@ -1,34 +1,35 @@
-SLURM job running in:  /work-zfs/lhc/heshy/JHUGen/xsecs/JHUGen/JHUGenerator
+SLURM job running in:  /work-zfs/lhc/heshy/JHUGen/xsecs/JHUGen_new/JHUGenerator
 LHAPDF 6.1.5 loading /work-zfs/lhc/cms/slc6_amd64_gcc493/external/lhapdf/6.1.5-kpegke3/share/LHAPDF/NNPDF30_lo_as_0130/NNPDF30_lo_as_0130_0000.dat
 NNPDF30_lo_as_0130 PDF set, member #0, version 2; LHAPDF ID = 263000
  
                                                                                           
    ***************************************************************************************
-   *                                JHU Generator v6.9.9                                 *
+   *                                JHU Generator v7.0.2                                 *
    ***************************************************************************************
    *                                                                                     *
    *   Spin and parity determination of single-produced resonances at hadron colliders   *
    *                                                                                     *
    *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *
-   *        C. Martin, K. Melnikov, R.Rontsch, H. Roskes, U. Sarica, M. Schulze,         *
+   *        C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,        *
    *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *
-   *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *
-   *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *
-   *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *
+   *               Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],              *
+   *               Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],              *
+   *               Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],              *
+   *               Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].              *
    *                                                                                     *
    ***************************************************************************************
                                                                                           
    
-   Command line: ./JHUGen Unweighted=0 VegasNc0=99999999 VegasNc1=99999999 VegasNc2=99999999 LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info MReso=374 ghz1=1,0 Process=0 PChannel=0 Interf=0
+   Command line: ./JHUGen Unweighted=0 VegasNc0=99999999 VegasNc1=99999999 VegasNc2=99999999 LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info MReso=374 DecayMode1=0 DecayMode2=0 Interf=0 Process=0 ghz1=1,0
    
    Input Parameter:
     Collider: P-P, sqrt(s)=13000.00
     Resonance: spin=0, mass= 374.00 width=   0.00407
     DecayMode1: 0  DecayMode2: 0
     Z-boson: mass=91.188, width=2.4952
-    Random seed:    64341107
+    Random seed:   478263641
     To reproduce results using this seed, JHUGen should be compiled with the same compiler:
-      GNU Fortran (GCC) 4.8.2
+      GNU Fortran (GCC) 4.9.3
     
     OffXVV: TTT
     WidthScheme:   2
@@ -41,12 +42,7 @@ NNPDF30_lo_as_0130 PDF set, member #0, version 2; LHAPDF ID = 263000
     spin-0-VV couplings: 
       generate_as=F
       ghg2=  0.10000000E+01  0.00000000E+00i
-      ghg3=  0.00000000E+00  0.00000000E+00i
-      ghg4=  0.00000000E+00  0.00000000E+00i
       ghz1=  0.10000000E+01  0.00000000E+00i
-      ghz2=  0.00000000E+00  0.00000000E+00i
-      ghz3=  0.00000000E+00  0.00000000E+00i
-      ghz4=  0.00000000E+00  0.00000000E+00i
       Lambda=  1000.0
     
     LHE output: ./data/output.lhe
@@ -55,10 +51,10 @@ NNPDF30_lo_as_0130 PDF set, member #0, version 2; LHAPDF ID = 263000
     
   Running
 
-  Input parameters for vegas:  ndim= 11   ncall= 97656250.
+  Input parameters for vegas:  ndim= 11   ncall= 99999999.
                               it=    0    itmx=    5
                               acc=-1.00    
-                              mds=  1     nd=  50
+                              mds=  0     nd=  50
                               (xl,xu)= (  0.00000     ,  1.00000     )
                                        (  0.00000     ,  1.00000     )
                                        (  0.00000     ,  1.00000     )
@@ -73,56 +69,56 @@ NNPDF30_lo_as_0130 PDF set, member #0, version 2; LHAPDF ID = 263000
 
 #********** Integration by Vegas (iteration       1) ************
 #                                                               *
-#  integral  =  32614.123       accum. integral =  32614.123    *
-#  std. dev. =  11.593072       accum. std. dev =  11.593072    *
-#   min/max. wt. =    0.00000            0.250647E-01           *
+#  integral  =  32576.739       accum. integral =  32576.739    *
+#  std. dev. =  13.417376       accum. std. dev =  13.417376    *
+#   min/max. wt. =    0.00000            0.250506E-01           *
 #                                                               *
-#*************   chi**2/iteration =  0.000       ****************
+#*************   chi**2/iteration = -.1987E-05   ****************
 
 
 #********** Integration by Vegas (iteration       2) ************
 #                                                               *
-#  integral  =  32597.851       accum. integral =  32598.417    *
-#  std. dev. =  2.1988988       accum. std. dev =  2.1608830    *
-#   min/max. wt. =    0.00000            0.205030E-02           *
+#  integral  =  32593.547       accum. integral =  32592.610    *
+#  std. dev. =  3.2606830       accum. std. dev =  3.1677371    *
+#   min/max. wt. =    0.00000            0.200751E-02           *
 #                                                               *
-#*************   chi**2/iteration =  1.901       ****************
+#*************   chi**2/iteration =  1.480       ****************
 
 
 #********** Integration by Vegas (iteration       3) ************
 #                                                               *
-#  integral  =  32604.332       accum. integral =  32601.847    *
-#  std. dev. =  1.8390992       accum. std. dev =  1.4005481    *
-#   min/max. wt. =    0.00000            0.123779E-02           *
+#  integral  =  32602.406       accum. integral =  32598.845    *
+#  std. dev. =  2.3954651       accum. std. dev =  1.9103580    *
+#   min/max. wt. =    0.00000            0.125259E-02           *
 #                                                               *
-#*************   chi**2/iteration =  3.122       ****************
+#*************   chi**2/iteration =  3.780       ****************
 
 
 #********** Integration by Vegas (iteration       4) ************
 #                                                               *
-#  integral  =  32596.607       accum. integral =  32599.856    *
-#  std. dev. =  1.7888234       accum. std. dev =  1.1027981    *
-#   min/max. wt. =    0.00000            0.329329E-02           *
+#  integral  =  32597.954       accum. integral =  32598.481    *
+#  std. dev. =  2.3017734       accum. std. dev =  1.4699701    *
+#   min/max. wt. =    0.00000            0.310890E-02           *
 #                                                               *
-#*************   chi**2/iteration =  3.855       ****************
+#*************   chi**2/iteration =  2.550       ****************
 
 
 #********** Integration by Vegas (iteration       5) ************
 #                                                               *
-#  integral  =  32600.207       accum. integral =  32599.952    *
-#  std. dev. =  1.7976090       accum. std. dev = 0.94001159    *
-#   min/max. wt. =    0.00000            0.408668E-02           *
+#  integral  =  32601.081       accum. integral =  32599.234    *
+#  std. dev. =  2.3036719       accum. std. dev =  1.2391538    *
+#   min/max. wt. =    0.00000            0.378862E-02           *
 #                                                               *
-#*************   chi**2/iteration =  2.898       ****************
+#*************   chi**2/iteration =  2.139       ****************
 
  ****************************************************
  * Writing out vegas grid to ./data/output.grid                                                      
  ****************************************************
 
-  Input parameters for vegas:  ndim= 11   ncall= 97656250.
+  Input parameters for vegas:  ndim= 11   ncall= 99999999.
                               it=    0    itmx=    2
                               acc=-1.00    
-                              mds=  1     nd=  50
+                              mds=  0     nd=  50
                               (xl,xu)= (  0.00000     ,  1.00000     )
                                        (  0.00000     ,  1.00000     )
                                        (  0.00000     ,  1.00000     )
@@ -137,19 +133,19 @@ NNPDF30_lo_as_0130 PDF set, member #0, version 2; LHAPDF ID = 263000
 
 #********** Integration by Vegas (iteration       1) ************
 #                                                               *
-#  integral  =  32600.346       accum. integral =  32600.346    *
-#  std. dev. =  1.8019997       accum. std. dev =  1.8019997    *
-#   min/max. wt. =    0.00000            0.421217E-02           *
+#  integral  =  32597.565       accum. integral =  32597.565    *
+#  std. dev. =  2.3066652       accum. std. dev =  2.3066652    *
+#   min/max. wt. =    0.00000            0.432906E-02           *
 #                                                               *
-#*************   chi**2/iteration = -.3671E-04   ****************
+#*************   chi**2/iteration = -.2240E-04   ****************
 
 
 #********** Integration by Vegas (iteration       2) ************
 #                                                               *
-#  integral  =  32600.445       accum. integral =  32600.395    *
-#  std. dev. =  1.8052411       accum. std. dev =  1.2753507    *
-#   min/max. wt. =    0.00000            0.411050E-02           *
+#  integral  =  32598.842       accum. integral =  32598.203    *
+#  std. dev. =  2.3085907       accum. std. dev =  1.6317390    *
+#   min/max. wt. =    0.00000            0.390734E-02           *
 #                                                               *
-#*************   chi**2/iteration = 0.1501E-02   ****************
+#*************   chi**2/iteration = 0.1530       ****************
 
  Done
