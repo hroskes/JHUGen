@@ -24,7 +24,6 @@
       integer, intent(in) :: MY_IDUP(6:9)
       complex(dp) :: A_VV(1:8)
       integer :: i1,i2,i3,i4,VVMode
-      real(dp) :: gZ_sq
       real(dp) :: prefactor!,res2
       real(dp) :: intcolfac
       integer :: ordering(1:4),ordering_swap(1:4)
@@ -38,13 +37,12 @@
       call getDecay_VVMode_Ordering(MY_IDUP(6:9),VVMode,ordering,ordering_swap)
 
 ! Global normalization
-      gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
       if( VVMode.eq.ZZMode ) then!  Z decay
-         prefactor = 8d0*gZ_sq**2
+         prefactor = 8d0*overallCouplVffsq**2
       elseif( VVMode.eq.WWMode ) then !  W decay
-         prefactor = 8d0*gZ_sq**2
+         prefactor = 8d0*overallCouplVffsq**2
       elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
-         prefactor = 8d0*gZ_sq ! Only single powers
+         prefactor = 8d0*overallCouplVffsq ! Only single powers
       elseif( VVMode.eq.ggMode ) then !  photon "decay"
          prefactor = 8d0
       else
@@ -59,7 +57,7 @@
 ! if (MY_IDUP(7).ne.MY_IDUP(9) ) return
 ! if (MY_IDUP(6).eq.MY_IDUP(8) ) return
 ! if (MY_IDUP(7).eq.MY_IDUP(9) ) return
-! print *, "MY COUPL",al1*dsqrt(gZ_sq),ar1*dsqrt(gZ_sq)
+! print *, "MY COUPL",al1*dsqrt(overallCouplVffsq),ar1*dsqrt(overallCouplVffsq)
 ! ar1=-0.158480099490745d0! this is MadGraphs gzl(R)  , the MG couplings differ by a global minus sign, relative differences are because of different input parameters
 ! al1=+0.210150647402957d0! this is MadGraphs gzl(L)
 ! al2=al1
@@ -357,7 +355,7 @@
       integer, intent(in) :: MY_IDUP(6:9)
       complex(dp) :: A_VV(1:8),VVHg1,VVHg2,VVHg3
       integer :: i3,i4,VVMode
-      real(dp) :: gZ_sq,s
+      real(dp) :: s
       real(dp) :: prefactor
       real(dp) :: intcolfac
       integer :: ordering(1:4),ordering_swap(1:4)
@@ -371,13 +369,12 @@
       call getDecay_VVMode_Ordering(MY_IDUP(6:9),VVMode,ordering,ordering_swap)
 
 ! Global normalization
-         gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
          if( VVMode.eq.ZZMode ) then!  Z decay
-            prefactor = gZ_sq**2
+            prefactor = overallCouplVffsq**2
          elseif( VVMode.eq.WWMode ) then !  W decay
-            prefactor = gZ_sq**2
+            prefactor = overallCouplVffsq**2
          elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
-            prefactor = gZ_sq ! Only single powers
+            prefactor = overallCouplVffsq ! Only single powers
          elseif( VVMode.eq.ggMode ) then !  photon "decay"
             prefactor = 1d0
          else
@@ -390,7 +387,7 @@
 ! if (MY_IDUP(7).ne.MY_IDUP(9) ) return
 ! if (MY_IDUP(6).eq.MY_IDUP(8) ) return
 ! if (MY_IDUP(7).eq.MY_IDUP(9) ) return
-! print *, "MY COUPL",al1*dsqrt(gZ_sq),ar1*dsqrt(gZ_sq)
+! print *, "MY COUPL",al1*dsqrt(overallCouplVffsq),ar1*dsqrt(overallCouplVffsq)
 ! ar1=-0.158480099490745d0! this is MadGraphs gzl(R)  , the MG couplings differ by a global minus sign, relative differences are because of different input parameters
 ! al1=+0.210150647402957d0! this is MadGraphs gzl(L)
 ! al2=al1
@@ -625,12 +622,14 @@
    SUBROUTINE EvalAmp_H_FF(pin,mass_F,res)
    implicit none
    real(dp), intent(out) ::  res
+   complex(dp) :: amp2
    real(dp), intent(in) :: pin(1:4,1:2),mass_F
    real(dp)             :: s12
 
       s12=2d0*(pin(1,1)*pin(1,2)-pin(2,1)*pin(2,2)-pin(3,1)*pin(3,2)-pin(4,1)*pin(4,2)) + 2d0*mass_F**2
-      res =   2d0*s12*(kappa_tilde**2 + kappa**2) - 8d0*mass_F**2*kappa**2
-      res=res*mass_F**2/vev**2
+      amp2 =   2d0*s12*(kappa_tilde**2 + kappa**2) - 8d0*mass_F**2*kappa**2
+      amp2 = amp2*mass_F**2/vev**2
+      res = cdabs(amp2)
 
    RETURN
    END SUBROUTINE
@@ -672,7 +671,7 @@
 ! overall factors and propagators
       amp=amp/(s123-mass_F**2+ci*mass_F*ga_F)/(s456-mass_F**2+ci*mass_F*ga_F)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
       amp=amp*16d0*ci*mass_F*gwsq**2
-      res = cdabs(amp)
+      res = cdabs(amp)**2
 
    RETURN
    END SUBROUTINE

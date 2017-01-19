@@ -9,6 +9,7 @@ MODULE ModJHUGenMELA
 
 ! JHUGenMELA-specific subroutines and functions
 
+public :: SetEWParameters
 public :: SetHiggsMassWidth
 public :: SetDecayModes
 public :: SetTopDecays
@@ -22,7 +23,9 @@ public :: SetSpinTwoCouplings
 
 public :: GetMVGV
 public :: GetAlphaSAlphaSMZ
+public :: GetPDFConstants
 public :: GetDecayCouplings
+
 
 contains
 
@@ -31,11 +34,23 @@ contains
 ! Subroutines visible to the user
 !=====================================================
 
+subroutine SetEWParameters(inMZ, inMW, inGf, inalpha_QED, inxw)
+   implicit none
+   real(8), intent(in) :: inMZ, inMW, inGf, inalpha_QED, inxw
+   M_Z = inMZ
+   M_W = inMW
+   Gf = inGf
+   alpha_QED = inalpha_QED
+   xw = inxw
+   call ComputeEWVariables()
+end subroutine SetEWParameters
+
+
 subroutine SetHiggsMassWidth(mass,width)
    implicit none
    real(8), intent(in) :: mass, width
-   M_Reso = mass
-   Ga_Reso = width
+   call SetMass(mass,Hig_)
+   call SetDecayWidth(width,Hig_)
    return
 end subroutine SetHiggsMassWidth
 
@@ -456,6 +471,16 @@ real(8), intent(out) :: val_as, val_asmz
    val_as=alphas
    val_asmz=alphas_mz
 end subroutine
+
+subroutine GetPDFConstants(pdfzmass, pdfnloops, pdfnf)
+implicit none
+real(8), intent(out) :: pdfzmass
+integer, intent(out) :: pdfnloops, pdfnf
+   pdfzmass=zmass_pdf
+   pdfnloops=nloops_pdf
+   pdfnf=nQflavors_pdf
+end subroutine GetPDFConstants
+
 
 ! This subroutine is slightly different form the one in the decay MEs in the sense that onshell photon returns 0,0 instead of 1,1
 subroutine GetDecayCouplings(VVMode,idordered,aL1,aR1,aL2,aR2)

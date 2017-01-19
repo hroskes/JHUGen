@@ -22,7 +22,6 @@
       real(dp) :: pin(4,4)
       complex(dp) :: A(2)
       integer :: i1,i2,i3,i4,ordering(1:4),ordering_swap(1:4),idV(1:2),VVmode
-      real(dp) :: gZ_sq
       real(dp) :: prefactor
       real(dp) :: intcolfac
 
@@ -34,15 +33,13 @@
 
       call getDecay_VVMode_Ordering(MY_IDUP(6:9),VVMode,ordering,ordering_swap)
 
-! Global normalization
-      gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 !---- full prefactor; 3 is  the color factor
       if( VVMode.eq.ZZMode ) then!  Z decay
-         prefactor = 3d0*gZ_sq**2
+         prefactor = 3d0*overallCouplVffsq**2
       elseif( VVMode.eq.WWMode ) then !  W decay
-         prefactor = 3d0*gZ_sq**2
+         prefactor = 3d0*overallCouplVffsq**2
       elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
-         prefactor = 3d0*gZ_sq ! Only single powers
+         prefactor = 3d0*overallCouplVffsq ! Only single powers
       elseif( VVMode.eq.ggMode ) then !  photon "decay"
          prefactor = 3d0
       else
@@ -251,17 +248,15 @@ enddo
 !----- a subroutine for Zprime -> ZZ/WW
 !----- all outgoing convention and the following momentum assignment
 !-----  0 --> Zprime(p1) e-(p3) + e+(p4) +mu-(p5) +mu+(p6)
-     subroutine EvalAmp_Zprime_VV(p,M_Reso,Ga_Reso,vvcoupl,MY_IDUP,sum)
+     subroutine EvalAmp_Zprime_VV(p,MY_IDUP,sum)
       implicit none
       real(dp), intent(out) ::  sum
-      real(dp), intent(in) :: p(4,6),M_Reso,Ga_Reso
-      complex(dp) :: vvcoupl(1:2)
+      real(dp), intent(in) :: p(4,6)
       integer, intent(in) :: MY_IDUP(6:9)
       real(dp) :: pin(4,4)
       complex(dp) :: A(2)
       integer :: i1,i2,i3,i4,ordering(1:4),ordering_swap(1:4),idV(1:2),VVmode
       real(dp) :: aL1,aR1,aL2,aR2
-      real(dp) :: gZ_sq
       real(dp) :: prefactor
       real(dp) :: intcolfac
 
@@ -273,14 +268,13 @@ enddo
 
       call getDecay_VVMode_Ordering(MY_IDUP(6:9),VVMode,ordering,ordering_swap)
 
-      gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 !---- full prefactor
       if( VVMode.eq.ZZMode ) then!  Z decay
-         prefactor = gZ_sq**2
+         prefactor = overallCouplVffsq**2
       elseif( VVMode.eq.WWMode ) then !  W decay
-         prefactor = gZ_sq**2
+         prefactor = overallCouplVffsq**2
       elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
-         prefactor = gZ_sq ! Only single powers
+         prefactor = overallCouplVffsq ! Only single powers
       elseif( VVMode.eq.ggMode ) then !  photon "decay"
          prefactor = 1d0
       else

@@ -22,35 +22,33 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
    character(len=pdfstrlength) pdftable
    integer :: pdfmember
 
-   Collider=1
-   VegasIt1=-1
-   VegasNc0=-1
-   VegasNc1=-1
-   VegasNc2=-1
-   PChannel=2
+   call SetJHUGenDefaults()
 
    includeInterference=.true.
    includeGammaStar=.true.
-   DecayMode1=0  ! Z/W+
-   DecayMode2=0  ! Z/W-
    WidthScheme=0
-   TopDecays=-1
-   TauDecays=-1
-   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    PDFSet=3      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
    LHAPDFString = pdftable
    LHAPDFMember = pdfmember
    lenLHAPDFString = pdfstrlength
 
-   MuFacMultiplier = 1d0
-   MuRenMultiplier = 1d0
-   FacScheme = kRenFacScheme_default
-   RenScheme = kRenFacScheme_default
-
-   call ResetMubarHGabarH()
-
 !---------------------------
    call PrintLogo(io_stdout)
+!---------------------------
+   call ResetMubarHGabarH()
+!---------------------------
+   call ComputeEWVariables()
+   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb)
+   print *, "JHUGen CKM initialization"
+   print *, "Vud = ",VCKM_ud
+   print *, "Vus = ",VCKM_us
+   print *, "Vub = ",VCKM_ub
+   print *, "Vcd = ",VCKM_cd
+   print *, "Vcs = ",VCKM_cs
+   print *, "Vcb = ",VCKM_cb
+   print *, "Vtd = ",VCKM_td
+   print *, "Vts = ",VCKM_ts
+   print *, "Vtb = ",VCKM_tb
 !---------------------------
 
 #if useLHAPDF==1
@@ -87,7 +85,62 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
 
 END SUBROUTINE
 
+SUBROUTINE SetJHUGenDefaults()
+   use ModParameters
+   implicit none
 
+   call SetDefaultCKM()
+
+   Collider=1
+   VegasIt1=-1
+   VegasNc0=-1
+   VegasNc1=-1
+   VegasNc2=-1
+   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
+   PChannel=2
+   DecayMode1=0  ! Z/W+
+   DecayMode2=0  ! Z/W-
+! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
+! !       DecayMode=1:  Z --> q qbar (q=u,d,c,s,b)
+! !       DecayMode=2:  Z --> tau+ tau-
+! !       DecayMode=3:  Z --> nu nubar (nu=nu_e,nu_mu,nu_tau)
+! !       DecayMode=4:  W --> l nu_l (l=e,mu)
+! !       DecayMode=5:  W --> q qbar' (q=u,c, qbar'=d,s)
+! !       DecayMode=6:  W --> tau nu_tau
+! !       DecayMode=7:  photon
+! !       DecayMode=8:  Z --> l+ l- (l=e,mu,tau)
+! !       DecayMode=9:  Z --> anything
+! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
+! !       DecayMode=11: W --> anything
+   TopDecays=-1
+   TauDecays=-1
+   H_DK = .false.
+   Unweighted =.true.
+   MuFacMultiplier = 1d0
+   MuRenMultiplier = 1d0
+   FacScheme = kRenFacScheme_default
+   RenScheme = kRenFacScheme_default
+   OffShellReson=.true.
+   OffShellV1=.true.
+   OffShellV2=.true.
+
+   LHEProdFile=""
+   ReadLHEFile=.false.
+   ConvertLHEFile=.false.
+   ReadCSmax=.false.
+   ReadPMZZ = .false.
+   PMZZFile="PMZZdistribution.out"
+   PMZZEvals=-1
+   DoPrintPMZZ = .false.
+   PrintPMZZIntervals = 20
+   GenerateEvents=.false.
+   RequestNLeptons = -1
+   RequestOS=-1
+   RequestOSSF=-1
+   CountTauAsAny = .true.
+   WriteFailedEvents=0
+
+END SUBROUTINE SetJHUGenDefaults
 
 SUBROUTINE InitPDFValues()
    use ModParameters
@@ -103,7 +156,7 @@ SUBROUTINE InitPDFValues()
 #endif
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-	Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+   Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
    call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE
@@ -187,26 +240,28 @@ end subroutine
 
 SUBROUTINE PrintLogo(TheUnit)
 use modParameters
+use modMisc
 implicit none
 integer :: TheUnit
+integer, parameter :: linelength = 87
 
-    write(TheUnit,"(A90)") " "
-    write(TheUnit,"(A90)") " ***************************************************************************************"
-    write(TheUnit,"(A50,A6,A34)") " *                                  JHUGen MELA ",trim(JHUGen_Version),"              *"
-    write(TheUnit,"(A90)") " ***************************************************************************************"
-    write(TheUnit,"(A90)") " *                                                                                     *"
-    write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
-    write(TheUnit,"(A90)") " *                                                                                     *"
-    write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *"
-    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,        *"
-    write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
-    write(TheUnit,"(A90)") " *               Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],              *"
-    write(TheUnit,"(A90)") " *               Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],              *"
-    write(TheUnit,"(A90)") " *               Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],              *"
-    write(TheUnit,"(A90)") " *               Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].              *"
-    write(TheUnit,"(A90)") " *                                                                                     *"
-    write(TheUnit,"(A90)") " ***************************************************************************************"
-    write(TheUnit,"(A90)") " "
+    write(TheUnit, *) " "
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " ", CenterWithStars("JHUGen MELA "//trim(JHUGen_Version), linelength)
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " ", CenterWithStars("", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Spin and parity determination of single-produced resonances at hadron colliders", linelength)
+    write(TheUnit, *) " ", CenterWithStars("", linelength)
+    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].", linelength)
+    write(TheUnit, *) " ", CenterWithStars("", linelength)
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " "
 return
 END SUBROUTINE
 

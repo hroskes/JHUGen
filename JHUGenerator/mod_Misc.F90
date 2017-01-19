@@ -1047,4 +1047,22 @@ real :: infinity, x
 
 end function infinity
 
+function CenterWithStars(string, totallength)
+implicit none
+character(len=*) :: string
+integer :: totallength, nspaces, nleftspaces, nrightspaces
+character(len=totallength) CenterWithStars
+
+    if (len(trim(string)) .gt. totallength-2) then
+        call Error("len(trim(string)) > totallength-2!")
+    endif
+
+    nspaces = totallength - len(trim(string)) - 2
+    nleftspaces = nspaces/2
+    nrightspaces = nspaces-nleftspaces
+
+    CenterWithStars = "*" // repeat(" ", nleftspaces) // string // repeat(" ", nrightspaces) // "*"
+
+end function
+
 END MODULE
