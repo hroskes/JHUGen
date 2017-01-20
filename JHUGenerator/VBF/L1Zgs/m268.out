@@ -1,0 +1,240 @@
+SLURM job running in:  /work-zfs/lhc/heshy/JHUGen/xsecs/JHUGen/JHUGenerator
+LHAPDF 6.1.5 loading /work-zfs/lhc/cms/slc6_amd64_gcc493/external/lhapdf/6.1.5-kpegke3/share/LHAPDF/NNPDF30_lo_as_0130/NNPDF30_lo_as_0130_0000.dat
+NNPDF30_lo_as_0130 PDF set, member #0, version 2; LHAPDF ID = 263000
+ extending no. of histograms for vbf tests
+ 
+  
+  ***************************************************************************************
+  *                                JHU Generator v7.0.2                                 *
+  ***************************************************************************************
+  *                                                                                     *
+  *   Spin and parity determination of single-produced resonances at hadron colliders   *
+  *                                                                                     *
+  *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *
+  *        C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,        *
+  *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *
+  *              Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],               *
+  *              Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],               *
+  *              Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],               *
+  *              Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].               *
+  *                                                                                     *
+  ***************************************************************************************
+  
+   
+   Command line: ./JHUGen Unweighted=0 VegasNc0=99999999 VegasNc1=99999999 VegasNc2=99999999 LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info MReso=268 Process=60 deltaRcut=0 ghz1=0,0 ghzgs1_prime2=1,0 pTjetcut=15
+   
+   Input Parameter:
+    Collider: P-P, sqrt(s)=13000.00
+    Resonance: spin=0, mass= 268.00 width=   0.00407
+    Z-boson: mass=91.188, width=2.4952
+    W-boson: mass=80.399, width=2.0850
+    Jet cuts:
+            pT >=    15.00 GeV
+         |eta| <= Infinity
+        DeltaR >=     0.00
+           mJJ >=     0.00 GeV
+    Random seed:   620362832
+    To reproduce results using this seed, JHUGen should be compiled with the same compiler:
+      GNU Fortran (GCC) 4.8.2
+    
+    WidthScheme:   2
+    LHAPDF set NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info, member=  0
+    Unweighted: F
+    Intermediate off-shell photons: T
+    
+    spin-0-VV couplings: 
+      generate_as=F
+      ghg2=  0.10000000E+01  0.00000000E+00i
+      ghzgs1_prime2=  0.00000000E+00  0.00000000E+00i,  Lambda_zgs1=  1.0000E+04
+      Lambda=  1000.0
+    
+    LHE output: ./data/output.lhe
+    Histogram output: ./data/output.dat
+    Log file: ./data/output.log
+    
+  Running
+
+  Input parameters for vegas:  ndim=  9   ncall= 99999999.
+                              it=    0    itmx=   15
+                              acc=-1.00    
+                              mds=  0     nd=  50
+                              (xl,xu)= (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+
+#********** Integration by Vegas (iteration       1) ************
+#                                                               *
+#  integral  = 0.22093863E-04   accum. integral = 0.22093863E-04*
+#  std. dev. = 0.19044254E-05   accum. std. dev = 0.19044254E-05*
+#   min/max. wt. =    0.00000            0.139028E-05           *
+#                                                               *
+#*************   chi**2/iteration =  0.000       ****************
+
+
+#********** Integration by Vegas (iteration       2) ************
+#                                                               *
+#  integral  = 0.26615824E-04   accum. integral = 0.25264064E-04*
+#  std. dev. = 0.14980923E-05   accum. std. dev = 0.11527296E-05*
+#   min/max. wt. =    0.00000            0.131384E-05           *
+#                                                               *
+#*************   chi**2/iteration =  3.222       ****************
+
+
+#********** Integration by Vegas (iteration       3) ************
+#                                                               *
+#  integral  = 0.31739951E-04   accum. integral = 0.31077140E-04*
+#  std. dev. = 0.50509926E-06   accum. std. dev = 0.40866328E-06*
+#   min/max. wt. =    0.00000            0.236044E-06           *
+#                                                               *
+#*************   chi**2/iteration =  12.84       ****************
+
+
+#********** Integration by Vegas (iteration       4) ************
+#                                                               *
+#  integral  = 0.31602760E-04   accum. integral = 0.31593180E-04*
+#  std. dev. = 0.64922698E-07   accum. std. dev = 0.57597719E-07*
+#   min/max. wt. =    0.00000            0.105532E-07           *
+#                                                               *
+#*************   chi**2/iteration =  8.353       ****************
+
+
+#********** Integration by Vegas (iteration       5) ************
+#                                                               *
+#  integral  = 0.31681862E-04   accum. integral = 0.31667451E-04*
+#  std. dev. = 0.28406539E-07   accum. std. dev = 0.23799784E-07*
+#   min/max. wt. =    0.00000            0.272140E-08           *
+#                                                               *
+#*************   chi**2/iteration =  6.435       ****************
+
+
+#********** Integration by Vegas (iteration       6) ************
+#                                                               *
+#  integral  = 0.31672097E-04   accum. integral = 0.31670159E-04*
+#  std. dev. = 0.21992909E-07   accum. std. dev = 0.15618951E-07*
+#   min/max. wt. =    0.00000            0.123107E-08           *
+#                                                               *
+#*************   chi**2/iteration =  4.993       ****************
+
+
+#********** Integration by Vegas (iteration       7) ************
+#                                                               *
+#  integral  = 0.31688285E-04   accum. integral = 0.31677646E-04*
+#  std. dev. = 0.20021396E-07   accum. std. dev = 0.12098772E-07*
+#   min/max. wt. =    0.00000            0.130978E-08           *
+#                                                               *
+#*************   chi**2/iteration =  4.161       ****************
+
+
+#********** Integration by Vegas (iteration       8) ************
+#                                                               *
+#  integral  = 0.31698464E-04   accum. integral = 0.31684021E-04*
+#  std. dev. = 0.19374597E-07   accum. std. dev = 0.10160143E-07*
+#   min/max. wt. =    0.00000            0.795201E-09           *
+#                                                               *
+#*************   chi**2/iteration =  3.636       ****************
+
+
+#********** Integration by Vegas (iteration       9) ************
+#                                                               *
+#  integral  = 0.31673068E-04   accum. integral = 0.31681320E-04*
+#  std. dev. = 0.18722110E-07   accum. std. dev = 0.88730982E-08*
+#   min/max. wt. =    0.00000            0.809787E-09           *
+#                                                               *
+#*************   chi**2/iteration =  3.178       ****************
+
+
+#********** Integration by Vegas (iteration      10) ************
+#                                                               *
+#  integral  = 0.31701699E-04   accum. integral = 0.31685317E-04*
+#  std. dev. = 0.18841286E-07   accum. std. dev = 0.79952135E-08*
+#   min/max. wt. =    0.00000            0.101809E-08           *
+#                                                               *
+#*************   chi**2/iteration =  2.911       ****************
+
+
+#********** Integration by Vegas (iteration      11) ************
+#                                                               *
+#  integral  = 0.31668174E-04   accum. integral = 0.31682528E-04*
+#  std. dev. = 0.18909052E-07   accum. std. dev = 0.73447781E-08*
+#   min/max. wt. =    0.00000            0.283234E-08           *
+#                                                               *
+#*************   chi**2/iteration =  2.673       ****************
+
+
+#********** Integration by Vegas (iteration      12) ************
+#                                                               *
+#  integral  = 0.31704573E-04   accum. integral = 0.31685604E-04*
+#  std. dev. = 0.18962053E-07   accum. std. dev = 0.68360133E-08*
+#   min/max. wt. =    0.00000            0.532017E-09           *
+#                                                               *
+#*************   chi**2/iteration =  2.527       ****************
+
+
+#********** Integration by Vegas (iteration      13) ************
+#                                                               *
+#  integral  = 0.31671161E-04   accum. integral = 0.31683861E-04*
+#  std. dev. = 0.19099403E-07   accum. std. dev = 0.64278254E-08*
+#   min/max. wt. =    0.00000            0.765523E-09           *
+#                                                               *
+#*************   chi**2/iteration =  2.349       ****************
+
+
+#********** Integration by Vegas (iteration      14) ************
+#                                                               *
+#  integral  = 0.31682281E-04   accum. integral = 0.31683696E-04*
+#  std. dev. = 0.19448425E-07   accum. std. dev = 0.60976890E-08*
+#   min/max. wt. =    0.00000            0.263206E-08           *
+#                                                               *
+#*************   chi**2/iteration =  2.158       ****************
+
+
+#********** Integration by Vegas (iteration      15) ************
+#                                                               *
+#  integral  = 0.31713564E-04   accum. integral = 0.31686576E-04*
+#  std. dev. = 0.19248468E-07   accum. std. dev = 0.58084871E-08*
+#   min/max. wt. =    0.00000            0.610470E-09           *
+#                                                               *
+#*************   chi**2/iteration =  2.160       ****************
+
+ ****************************************************
+ * Writing out vegas grid to ./data/output.grid                                                      
+ ****************************************************
+
+  Input parameters for vegas:  ndim=  9   ncall= 99999999.
+                              it=    0    itmx=    2
+                              acc=-1.00    
+                              mds=  0     nd=  50
+                              (xl,xu)= (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+                                       (  0.00000     ,  1.00000     )
+
+#********** Integration by Vegas (iteration       1) ************
+#                                                               *
+#  integral  = 0.31666788E-04   accum. integral = 0.31666788E-04*
+#  std. dev. = 0.19359230E-07   accum. std. dev = 0.19359230E-07*
+#   min/max. wt. =    0.00000            0.109430E-08           *
+#                                                               *
+#*************   chi**2/iteration =  0.000       ****************
+
+
+#********** Integration by Vegas (iteration       2) ************
+#                                                               *
+#  integral  = 0.31672571E-04   accum. integral = 0.31669651E-04*
+#  std. dev. = 0.19556945E-07   accum. std. dev = 0.13758426E-07*
+#   min/max. wt. =    0.00000            0.835324E-09           *
+#                                                               *
+#*************   chi**2/iteration = 0.4411E-01   ****************
+
+ Done
