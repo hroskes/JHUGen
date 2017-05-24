@@ -313,7 +313,9 @@ class XsecScanProcessCouplings(XsecScanBase):
         if self.coupling == "g2": return 2
         if self.coupling == "g4": return 3
         if self.coupling == "L1": return 4
-        assert False
+        if self.coupling == "L1Zgs": return 5
+        if self.coupling == "SM_photoncut": return 6
+        assert False, self.coupling
 
 class XsecScanGroupProcess(XsecScanGroupBase):
     def __init__(self, process):
