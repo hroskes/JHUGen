@@ -127,8 +127,8 @@ class XsecScanBase(object):
         for m in range(500, 1000, 5): result.append(m)
         for m in range(1000, 1500, 10): result.append(m)
         for m in range(1500, 3000, 50): result.append(m)
+        for m in range(3000, 13000, 1000): result.append(m)
         result.append(125)
-        result.append(3000)
         result.sort()
         return result
 
