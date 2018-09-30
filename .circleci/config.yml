@@ -620,6 +620,9 @@ jobs:
       - restore_cache:
           key: v1_lhapdf_6_2_1
       - run:
+          name: install cython
+          command: pip install --user cython
+      - run:
           name: download LHAPDF
           command: |
             if ! [ -d ~/LHAPDF-6.2.1 ]; then
@@ -649,7 +652,9 @@ jobs:
           when: always
       - save_cache:
           key: v1_lhapdf_6_2_1
-          paths: ~/LHAPDF-6.2.1
+          paths:
+            - ~/.local/
+            - ~/LHAPDF-6.2.1
       - run:
           name: "check ReadCSmax"
           command: |
