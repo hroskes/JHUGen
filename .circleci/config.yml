@@ -617,6 +617,23 @@ jobs:
           name: "check that LHAPDF is turned off"
           command: "! grep 'UseLHAPDF *= *Yes' JHUGenerator/makefile"
           when: always
+      - restore_cache:
+          key: v1_lhapdf_6_2_1
+      - run:
+          name: download LHAPDF
+          command: |
+            if ! [ -d ~/LHAPDF-6.2.1 ]; then
+              cd $(mktemp -d)
+              wget http://www.hepforge.org/archive/lhapdf/LHAPDF-6.2.1.tar.gz
+              tar xvzf LHAPDF-6.2.1.tar.gz
+              cd LHAPDF-6.2.1
+              ./configure --prefix=$HOME/LHAPDF-6.2.1
+              make
+              make install
+            fi
+            cd ~/LHAPDF-6.2.1/bin
+            ./lhapdf install NNPDF31_lo_as_0130
+            echo "export LHAPDF_DATA_PATH=$HOME/LHAPDF-6.2.1/share/LHAPDF" >> $BASH_ENV
       - run:
           name: "check compiling and running with LHAPDF linked"
           command: |
@@ -625,11 +642,14 @@ jobs:
             (
               sed -i -r -e "s/^(UseLHAPDF *= *)No/\1Yes/" makefile
               make
+              ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 LHAPDF=NNPDF31_lo_as_0130/NNPDF31_lo_as_0130.info
             ) || exitcode=$?
-            #./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 LHAPDF=NNPDF31_lo_as_0130/NNPDF31_lo_as_0130.info
             git checkout -- makefile
             exit $exitcode
           when: always
+      - save_cache:
+          key: v1_lhapdf_6_2_1
+          paths: ~/LHAPDF-6.2.1
       - run:
           name: "check ReadCSmax"
           command: |
