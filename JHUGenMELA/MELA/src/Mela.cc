@@ -1934,7 +1934,11 @@ void Mela::setConstant(){
       )
       ) constant = getConstant_JHUGenUndecayed();
     else if ( // H->4l/2l2l
+      melaCand->getSortedV(0)
+      &&
       melaCand->getSortedV(0)->getNDaughters()==2
+      &&
+      melaCand->getSortedV(1)
       &&
       melaCand->getSortedV(1)->getNDaughters()==2
       &&
@@ -1943,7 +1947,11 @@ void Mela::setConstant(){
       PDGHelpers::isALepton(melaCand->getSortedV(1)->getDaughter(0)->id) && PDGHelpers::isALepton(melaCand->getSortedV(1)->getDaughter(1)->id)
       ) constant = getConstant_4l();
     else if ( // H->2l2q
+      melaCand->getSortedV(0)
+      &&
       melaCand->getSortedV(0)->getNDaughters()==2
+      &&
+      melaCand->getSortedV(1)
       &&
       melaCand->getSortedV(1)->getNDaughters()==2
       &&
@@ -1966,7 +1974,11 @@ void Mela::setConstant(){
       )
       ) constant = getConstant_2l2q();
     else if ( // H->4q
+      melaCand->getSortedV(0)
+      &&
       melaCand->getSortedV(0)->getNDaughters()==2
+      &&
+      melaCand->getSortedV(1)
       &&
       melaCand->getSortedV(1)->getNDaughters()==2
       &&
