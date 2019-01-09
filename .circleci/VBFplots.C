@@ -11,11 +11,9 @@
 using namespace std;
 
 double pi = TMath::Pi();
-const int nvariables = 15;
+const int nvariables = 9;
 const TString variables[nvariables] = {"Gencosthetastar_VBF", "GenhelcosthetaV1_VBF", "GenhelcosthetaV2_VBF", "Genhelphi_VBF", "GenphistarV1_VBF",
-                                       "GenQ_V1", "GenQ_V2", "GenDijetMass", "GenDRjet",
-                                       "leadingpT", "subleadingpT", "leadingeta", "subleadingeta", "leadingphi", "subleadingphi"};
-const int ntreevariables = nvariables-6;
+                                       "GenQ_V1", "GenQ_V2", "GenDiJetMass", "GenDRjet"};
 
 const int nfiles = 4;
 vector<TString> files[nfiles];
@@ -31,12 +29,9 @@ double maxes[nvariables] = {1, 1, 1, pi, pi,
                             1000, 1000, 2000, 12,
                             250, 250, 6, 6, pi, pi};
 
-bool withptcut = false;
-
 void VBFplots()
 {
     TString dir = "$LHEDIR/VBF/";
-    if (withptcut) dir += "/withptcut";
 
     setupfiles();
     THStack *h[nvariables];
@@ -68,35 +63,14 @@ void VBFplots()
         for (int i = 0; i < ntreevariables; i++)
             t->SetBranchAddress(variables[i], &(x[i]));
 
-        vector<double>  *pt = 0;
-        vector<double> *eta = 0;
-        vector<double> *phi = 0;
-        t->SetBranchAddress("GenAssociatedParticlePt", &pt);
-        t->SetBranchAddress("GenAssociatedParticleEta", &eta);
-        t->SetBranchAddress("GenAssociatedParticlePhi", &phi);
-
         long length = t->GetEntries();
         if (length == 0) continue;
         for (int l = 0; l < length; l++)
         {
             t->GetEntry(l);
-            bool passptcut = true;
-            for (unsigned int i = 0; i < pt->size(); i++)
-                if (pt->at(i) < 15)
-                    passptcut = false;
 
-            if (pt->at(0) <= pt->at(1))
-                cout << "bad pt " << l << " " << pt->at(0) << " " << pt->at(1) << endl;
-            x[9] = pt->at(0);
-            x[10] = pt->at(1);
-            x[11] = eta->at(0);
-            x[12] = eta->at(1);
-            x[13] = phi->at(0);
-            x[14] = phi->at(1);
-
-            if (passptcut || !withptcut)
-                for (int i = 0; i < nvariables; i++)
-                    hh[i][j]->Fill(x[i]);
+            for (int i = 0; i < nvariables; i++)
+                hh[i][j]->Fill(x[i]);
 
             if ((l+1) % 10000 == 0 || l+1 == length)
                 cout << l+1 << " / " << length << endl;

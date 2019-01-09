@@ -2,7 +2,7 @@ env: &env
   docker:
     - image: cmssw/cmssw:CMSSW_9_3_2
       environment:
-        PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
         CPATH: "/home/cmsbld/boost_1_61_0"
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
@@ -486,24 +486,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - restore_cache:
-          key: v1_analyzer
       - run:
           <<: *cmsrelcmsenv
       - run:
           <<: *jhugenversion
-      - run:
-          command: |
-            cd
-            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
-              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
-            fi
-            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
-            git pull
-            make all
-      - save_cache:
-          key: v1_analyzer
-          paths: ~/CMSJHU_AnalysisMacros/
 
       - run: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
@@ -512,10 +498,12 @@ jobs:
           command: |
             cd ..
             #take the whole MELA C++ code because of interdependencies (TCouplingsBase etc.), too complicated to sort out
-            #but no need for fortran or python
+            #and python which is used for LHE2root
             md5sum JHUGenerator/reference-lhes-md5sum-ggH $(
               git ls-files \
                 .circleci/angularDistributions_spin0_HVV.cc \
+                .circleci/LHE2root.py \
+                JHUGenMELA/MELA/python/ \
                 JHUGenMELA/MELA/src/ \
                 JHUGenMELA/MELA/interface/ \
               | sort
@@ -573,23 +561,24 @@ jobs:
               echo "The LHE files can be found in the artifacts at $(cat no-need-for-ggH-plots/$WHICHPLOTS)"
             fi
       - run:
-          name: analyzer
+          name: LHE2root
           command: |
+            cd ~/JHUGen/.circleci
             if $DOPLOTS; then
               if [ $WHICHPLOTS -eq 1 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SM.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 PS.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 a2.lhe
+                ./LHE2root.py $LHEDIR/SM.lhe $LHEDIR/SM.root --decay
+                ./LHE2root.py $LHEDIR/PS.lhe $LHEDIR/PS.root --decay
+                ./LHE2root.py $LHEDIR/a2.lhe $LHEDIR/a2.root --decay
               elif [ $WHICHPLOTS -eq 2 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa3.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa3imag.lhe
+                ./LHE2root.py $LHEDIR/SMa3.lhe $LHEDIR/SMa3.root --decay
+                ./LHE2root.py $LHEDIR/SMa3imag.lhe $LHEDIR/SMa3imag.root --decay
               elif [ $WHICHPLOTS -eq 3 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa2.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa2imag.lhe
+                ./LHE2root.py $LHEDIR/SMa2.lhe $LHEDIR/SMa2.root --decay
+                ./LHE2root.py $LHEDIR/SMa2imag.lhe $LHEDIR/SMa2imag.root --decay
               elif [ $WHICHPLOTS -eq 4 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2a3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa2a3.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_left.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 CT_left.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_leftright.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 CT_leftright.lhe
+                ./LHE2root.py $LHEDIR/SMa2a3.lhe $LHEDIR/SMa2a3.root --decay
+                ./LHE2root.py $LHEDIR/CT_left.lhe $LHEDIR/CT_left.root --decay
+                ./LHE2root.py $LHEDIR/CT_leftright.lhe $LHEDIR/CT_leftright.root --decay
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
@@ -661,24 +650,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - restore_cache:
-          key: v1_analyzer
       - run:
           <<: *cmsrelcmsenv
       - run:
           <<: *jhugenversion
-      - run:
-          command: |
-            cd
-            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
-              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
-            fi
-            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
-            git pull
-            make all
-      - save_cache:
-          key: v1_analyzer
-          paths: ~/CMSJHU_AnalysisMacros/
 
       - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
@@ -689,6 +664,8 @@ jobs:
             md5sum JHUGenerator/reference-lhes-md5sum-VBF $(
               git ls-files \
                 .circleci/VBFplots.C \
+                .circleci/LHE2root.py \
+                JHUGenMELA/MELA/python/ \
               | sort
             ) > JHUGenerator/VBF-plots-md5sum
       - restore_cache:
@@ -720,10 +697,10 @@ jobs:
           name: analyzer
           command: |
             if $DOPLOTS; then
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=HJJ_SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 HJJ_SM_decayed.lhe
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+              ./LHE2root.py $LHEDIR/SM_decayed.lhe $LHEDIR/SM.root --vbf
+              ./LHE2root.py $LHEDIR/HJJ_SM_decayed.lhe $LHEDIR/HJJ_SM.root --vbf
+              ./LHE2root.py $LHEDIR/PS_decayed.lhe $LHEDIR/PS.root --vbf
+              ./LHE2root.py $LHEDIR/a2_decayed.lhe $LHEDIR/a2.root --vbf
             else
               echo "The root files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
             fi
