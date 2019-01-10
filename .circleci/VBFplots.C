@@ -23,11 +23,9 @@ void setupfiles();
 
 
 double mins[nvariables] = {-1, -1, -1, -pi, -pi,
-                           0, 0, 0, 0,
-                           0, 0, -6, -6, -pi, -pi};
+                           0, 0, 0, 0};
 double maxes[nvariables] = {1, 1, 1, pi, pi,
-                            1000, 1000, 2000, 12,
-                            250, 250, 6, 6, pi, pi};
+                            1000, 1000, 2000, 12};
 
 void VBFplots()
 {
@@ -60,7 +58,7 @@ void VBFplots()
         }
 
         float x[nvariables];
-        for (int i = 0; i < ntreevariables; i++)
+        for (int i = 0; i < nvariables; i++)
             t->SetBranchAddress(variables[i], &(x[i]));
 
         long length = t->GetEntries();
