@@ -696,6 +696,7 @@ jobs:
       - run:
           name: analyzer
           command: |
+            cd ~/JHUGen/.circleci
             if $DOPLOTS; then
               ./LHE2root.py $LHEDIR/SM_decayed.lhe $LHEDIR/SM.root --vbf
               ./LHE2root.py $LHEDIR/HJJ_SM_decayed.lhe $LHEDIR/HJJ_SM.root --vbf
