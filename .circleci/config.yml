@@ -698,10 +698,10 @@ jobs:
           command: |
             cd ~/JHUGen/.circleci
             if $DOPLOTS; then
-              ./LHE2root.py $LHEDIR/SM_decayed.lhe $LHEDIR/SM.root --vbf
-              ./LHE2root.py $LHEDIR/HJJ_SM_decayed.lhe $LHEDIR/HJJ_SM.root --vbf
-              ./LHE2root.py $LHEDIR/PS_decayed.lhe $LHEDIR/PS.root --vbf
-              ./LHE2root.py $LHEDIR/a2_decayed.lhe $LHEDIR/a2.root --vbf
+              ./LHE2root.py $LHEDIR/SM_decayed.lhe $LHEDIR/SM.root --vbf --decay
+              ./LHE2root.py $LHEDIR/HJJ_SM_decayed.lhe $LHEDIR/HJJ_SM.root --vbf --decay
+              ./LHE2root.py $LHEDIR/PS_decayed.lhe $LHEDIR/PS.root --vbf --decay
+              ./LHE2root.py $LHEDIR/a2_decayed.lhe $LHEDIR/a2.root --vbf --decay
             else
               echo "The root files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
             fi
