@@ -266,7 +266,7 @@ void extractCoupling(string opt, ScalarPdfFactory_HVV& factory){
   }
   else valRe = atof(strVal.c_str());
 
-  bool setanomalous, setghv1;
+  bool setanomalous = false, setghv1 = false;
 
   // Here we go again, sillions of couplings
   if (wish=="cv_q1sq"){ ((RooRealVar*)couplings.cLambda_qsq[cLambdaHIGGS_VV_QSQ1])->setVal((int) valRe); }

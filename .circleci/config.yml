@@ -606,8 +606,8 @@ jobs:
                 #g1 = 1, g2 = 1.65684 * (-1 + i sqrt(3)) / 2, g4 = 2.55052 * (-1 - i sqrt(3)) / 2
                 root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa2a3.root", "ghv1=1,0;ghv2=-0.82842,1.43486553;ghv4=-1.27526,2.20881511", "ZZ4l", "$LHEDIR/SMa2a3/")'
 
-                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_left.root", "ghvvp1=1,0;gVprimeff_decay2_left=1", "ZZ2l2nu", "$LHEDIR/CT_left/", 125, 40)'
-                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghvvp1=1,0;gVprimeff_decay2_left=1;gVprimeff_decay2_right=1", "ZZ2l2nu", "$LHEDIR/CT_leftright/", 125, 40)'
+                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_left.root", "ghv1=0,0;ghvvp1=1,0;gVprimeff_decay2_left=1", "ZZ2l2nu", "$LHEDIR/CT_left/", 125, 40)'
+                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghv1=0,0;ghvvp1=1,0;gVprimeff_decay2_left=1;gVprimeff_decay2_right=1", "ZZ2l2nu", "$LHEDIR/CT_leftright/", 125, 40)'
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
