@@ -266,7 +266,8 @@ void extractCoupling(string opt, ScalarPdfFactory_HVV& factory){
   }
   else valRe = atof(strVal.c_str());
 
-  bool setanomalous = false, setghv1 = false;
+  bool setanomalous = false, setghv1 = false,
+       setHVp = true, setVpff = true, setVpmass = true;
 
   // Here we go again, sillions of couplings
   if (wish=="cv_q1sq"){ ((RooRealVar*)couplings.cLambda_qsq[cLambdaHIGGS_VV_QSQ1])->setVal((int) valRe); }
@@ -334,27 +335,44 @@ void extractCoupling(string opt, ScalarPdfFactory_HVV& factory){
   else if (wish=="ghgsgs3"){ ((RooRealVar*) couplings.ggsgs3List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs3List[0][1])->setVal(valIm); setanomalous = true; }
   else if (wish=="ghgsgs4"){ ((RooRealVar*) couplings.ggsgs4List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs4List[0][1])->setVal(valIm); setanomalous = true; }
 
-  else if (wish=="ghvvp1"){ ((RooRealVar*) couplings.gvvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvvp1List[0][1])->setVal(valIm); setanomalous = true; }
-  else if (wish=="ghvpvp1"){ ((RooRealVar*) couplings.gvpvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvpvp1List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghvvp1"){ ((RooRealVar*) couplings.gvvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvvp1List[0][1])->setVal(valIm); setanomalous = true; setHVp = true; }
+  else if (wish=="ghvpvp1"){ ((RooRealVar*) couplings.gvpvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvpvp1List[0][1])->setVal(valIm); setanomalous = true; setHVp = true; }
 
   else if (wish=="mW") ((RooRealVar*) parameters.mW)->setVal(valRe);
   else if (wish=="mZ") ((RooRealVar*) parameters.mZ)->setVal(valRe);
-  else if (wish=="mWprime") ((RooRealVar*) parameters.mWprime)->setVal(valRe);
-  else if (wish=="mZprime") ((RooRealVar*) parameters.mZprime)->setVal(valRe);
+  else if (wish=="mWprime") { ((RooRealVar*) parameters.mWprime)->setVal(valRe); setVpmass = true; }
+  else if (wish=="mZprime") { ((RooRealVar*) parameters.mZprime)->setVal(valRe); setVpmass = true; }
   else if (wish=="gamW") ((RooRealVar*) parameters.gamW)->setVal(valRe);
   else if (wish=="gamZ") ((RooRealVar*) parameters.gamZ)->setVal(valRe);
   else if (wish=="gamWprime") ((RooRealVar*) parameters.gamWprime)->setVal(valRe);
   else if (wish=="gamZprime") ((RooRealVar*) parameters.gamZprime)->setVal(valRe);
 
-  else if (wish=="gVprimeff_decay1_left") ((RooRealVar*) parameters.gVprimeff_decay1_left)->setVal(valRe);
-  else if (wish=="gVprimeff_decay1_right") ((RooRealVar*) parameters.gVprimeff_decay1_right)->setVal(valRe);
-  else if (wish=="gVprimeff_decay2_left") ((RooRealVar*) parameters.gVprimeff_decay2_left)->setVal(valRe);
-  else if (wish=="gVprimeff_decay2_right") ((RooRealVar*) parameters.gVprimeff_decay2_right)->setVal(valRe);
+  else if (wish=="gVprimeff_decay1_left") {((RooRealVar*) parameters.gVprimeff_decay1_left)->setVal(valRe); setVpff = true; }
+  else if (wish=="gVprimeff_decay1_right") {((RooRealVar*) parameters.gVprimeff_decay1_right)->setVal(valRe); setVpff = true; }
+  else if (wish=="gVprimeff_decay2_left") {((RooRealVar*) parameters.gVprimeff_decay2_left)->setVal(valRe); setVpff = true; }
+  else if (wish=="gVprimeff_decay2_right") {((RooRealVar*) parameters.gVprimeff_decay2_right)->setVal(valRe); setVpff = true; }
 
   else cerr << "extractCoupling: Coupling " << wish << " is not supported!" << endl;
 
   if (setanomalous && !setghv1){
     cerr << "set an anomalous HVV coupling, but didn't set ghv1!" << endl;
+    assert(0);
+  }
+
+  if (setHVp && !setVpff) {
+    cerr << "if you set HVV' or HVV' couplings, you also have to set V'ff couplings" << endl;
+    assert(0);
+  }
+  if (!setHVp && setVpff) {
+    cerr << "if you set V'ff couplings, you also have to set HVV' or HVV' couplings" << endl;
+    assert(0);
+  }
+  if (setHVp && !setVpmass) {
+    cerr << "if you set HVV' or HVV' couplings, you also have to set the V' mass" << endl;
+    assert(0);
+  }
+  if (!setHVp && setVpmass) {
+    cerr << "if you set the V' mass, you also have to set HVV' or HVV' couplings" << endl;
     assert(0);
   }
 }
