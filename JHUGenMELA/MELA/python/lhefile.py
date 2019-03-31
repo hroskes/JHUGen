@@ -1,10 +1,15 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import abc
 import collections
 import re
+import six
+from six.moves import range
+from six.moves import zip
 
 if __name__ == "__main__":
   import argparse, itertools, sys, unittest
-  from mela import TVar
+  from .mela import TVar
   parser = argparse.ArgumentParser()
   parser.add_argument('--lhefile-hwithdecay')
   parser.add_argument('--lhefile-jhugenvbfvh')
@@ -14,12 +19,11 @@ if __name__ == "__main__":
 
 import ROOT
 
-from mela import Mela, SimpleParticle_t, SimpleParticleCollection_t
+from .mela import Mela, SimpleParticle_t, SimpleParticleCollection_t
 
 InputEvent = collections.namedtuple("InputEvent", "daughters associated mothers isgen")
 
-class LHEEvent(object):
-  __metaclass__ = abc.ABCMeta
+class LHEEvent(six.with_metaclass(abc.ABCMeta, object)):
   def __init__(self, event, isgen):
     lines = event.split("\n")
 
@@ -139,7 +143,7 @@ class LHEEvent_Offshell4l(LHEEvent):
 
   nassociatedparticles = None
 
-class LHEFileBase(object):
+class LHEFileBase(six.with_metaclass(abc.ABCMeta, object)):
   """
   Simple class to iterate through an LHE file and calculate probabilities for each event
   Example usage:
@@ -154,7 +158,6 @@ class LHEFileBase(object):
       p0minus = event.computeP()
       h2.Fill(p0plus / (p0plus + p0minus))
   """
-  __metaclass__ = abc.ABCMeta
 
   __melas = {}
 
@@ -192,7 +195,7 @@ class LHEFileBase(object):
         except GeneratorExit:
           raise
         except:
-          print "On line", linenumber
+          print("On line", linenumber)
           raise
         finally:
           try:
@@ -238,17 +241,17 @@ if __name__ == '__main__':
     @unittest.skipUnless(args.lhefile_hwithdecay, "needs --lhefile-hwithdecay argument")
     def testHwithDecay(self):
       with LHEFile_Hwithdecay(args.lhefile_hwithdecay) as f:
-        for event, i in itertools.izip(f, range(10)):
+        for event, i in zip(f, range(10)):
           event.ghz1 = 1
           event.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
           prob = event.computeP()
           self.assertNotEqual(prob, 0)
-          print prob, event.computeDecayAngles()
+          print(prob, event.computeDecayAngles())
 
     @unittest.skipUnless(args.lhefile_jhugenvbfvh, "needs --lhefile-jhugenvbfvh argument")
     def testJHUGenVBFVH(self):
       with LHEFile_JHUGenVBFVH(args.lhefile_jhugenvbfvh, isgen=False) as f:
-        for event, i in itertools.izip(f, range(10)):
+        for event, i in zip(f, range(10)):
           event.ghz1 = 1
           if any(11 <= abs(p.first) <= 16 for p in event.associated):
             if sum(p.first for p in event.associated) == 0:
@@ -262,12 +265,12 @@ if __name__ == '__main__':
             event.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
           prob = event.computeProdP()
           self.assertNotEqual(prob, 0)
-          print prob, event.computeVBFAngles(), event.computeVHAngles(VHprocess)
+          print(prob, event.computeVBFAngles(), event.computeVHAngles(VHprocess))
 
     @unittest.skipUnless(args.lhefile_jhugentth, "needs --lhefile-jhugentth argument")
     def testJHUGenttH(self):
       with LHEFile_JHUGenttH(args.lhefile_jhugentth) as f:
-        for event, i in itertools.izip(f, range(10)):
+        for event, i in zip(f, range(10)):
           pass
 
   unittest.main(argv=[sys.argv[0]]+args.unittest_args)

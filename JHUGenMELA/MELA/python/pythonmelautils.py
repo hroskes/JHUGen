@@ -1,8 +1,10 @@
+from __future__ import absolute_import
 from collections import OrderedDict
 import os
 import tempfile
 
 import ROOT
+from six.moves import range
 
 def include(filename):
   ROOT.gROOT.ProcessLine("#include <{}>".format(filename))

@@ -4,6 +4,9 @@
 test python and some MEs
 """
 
+from __future__ import absolute_import
+import six
+from six.moves import range
 if __name__ == "__main__":
   import argparse
   parser = argparse.ArgumentParser()
@@ -204,7 +207,7 @@ class TestMela(unittest.TestCase):
     m.setInputEvent_fromLHE_Hwithdecay(event, True)
 
     m.setProcess(*setprocessargs)
-    for coupling, value in couplings.iteritems():
+    for coupling, value in six.iteritems(couplings):
       if re.match("(ghz[1-4](_prime[2-7]?)?|b([1-9]|10))", coupling):
         pass
       elif re.match("(ghzgs([2-4]|1_prime2)|bzgs[12348])", coupling):
@@ -219,7 +222,7 @@ class TestMela(unittest.TestCase):
     m.setProcess(*setprocessargs)
 
     m.a1 = 1
-    for coupling, value in couplings.iteritems():
+    for coupling, value in six.iteritems(couplings):
       if usevpvp:
         newcoupling = coupling.replace("ghz", "ghzpzp").replace("b", "bzpzp")
       else:

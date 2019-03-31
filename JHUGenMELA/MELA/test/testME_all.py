@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
+from __future__ import print_function
 import argparse
 import os
 import random
@@ -13,7 +15,7 @@ p = argparse.ArgumentParser()
 p.add_argument("seed_for_sort", type=int, default=random.randrange(sys.maxsize), nargs="?")
 args = p.parse_args()
 random.seed(args.seed_for_sort)
-print "Seed:", args.seed_for_sort
+print("Seed:", args.seed_for_sort)
 
 import ROOT
 
@@ -95,7 +97,7 @@ for j, ref in enumerate(referencefiles, start=1):
     function = getattr(ROOT, functionname)
     function(*arguments)
   except:
-    print "trying to call: {}(*{})".format(functionname, arguments)
+    print("trying to call: {}(*{})".format(functionname, arguments))
     raise
 
   newfile = ref.replace(".ref", ".out")
@@ -168,7 +170,7 @@ for j, ref in enumerate(referencefiles, start=1):
       match = re.match("(p.*)_selfD: ([0-9.e+-]*)", line)
       if match:
         if float(match.group(2)) != pendingselfD.get(match.group(1)):
-          print float(match.group(2)), pendingselfD.get(match.group(1))
+          print(float(match.group(2)), pendingselfD.get(match.group(1)))
         if float(match.group(2)) != pendingselfD.pop(match.group(1), None):
           badselfD.add(newfile)
       else:
@@ -176,7 +178,7 @@ for j, ref in enumerate(referencefiles, start=1):
         if match:
           pendingselfD[match.group(1)] = float(match.group(2))
 
-  print j, "/", len(referencefiles), ref
+  print(j, "/", len(referencefiles), ref)
 
 errors = []
 if different:
