@@ -2346,7 +2346,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
 !call EvalAlphaS()
 !print *, "alphas = ",alphas
 !!call amp_VH_LO(MomExt1t(:,1:9),mass(3:5,:),(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
-!call EvalAmp_VHiggs(id,(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),MomExt1t(:,1:9),me2lo)
+!call EvalAmp_VHiggs_heshyhack(id,(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),MomExt1t(:,1:9),me2lo)
 !me2lo = me2lo *QuarkColAvg**2 * 3d0 *(M_Reso*Ga_Reso)**2
 !print*,"MomExt1t me2lo = ",me2lo
 !!enddo
@@ -2359,7 +2359,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
 !call SetRunningScales( (/ MomExt2t(1:4,5),MomExt2t(1:4,6),MomExt2t(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
 !call EvalAlphaS()
 !print *, "alphas = ",alphas
-!call EvalAmp_VHiggs(id,(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),MomExt2t(:,1:9),me2lo)
+!call EvalAmp_VHiggs_heshyhack(id,(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),MomExt2t(:,1:9),me2lo)
 !me2lo = me2lo *QuarkColAvg**2 * 3d0 *(M_Reso*Ga_Reso)**2
 !print*,"MomExt2t me2lo = ",me2lo
 !!enddo
@@ -2407,7 +2407,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
         j = -i
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
-          call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+          call EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
           if(IsNaN(me2))return
           !if(IsNaN(me2))return
           if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
@@ -2459,7 +2459,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
       EvalWeighted_VHiggs=0d0
       id(2)=convertLHE(ElM_)
       id(1)=-id(2)
-      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+      call EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
       if(IsNaN(me2))return
       if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
       LO_Res_Unpol =me2 * PreFac
@@ -2512,7 +2512,7 @@ elseif( IsAWDecay(DecayMode1) ) then
 
          if (CoupledVertex(idjhuvv(1:2),-1) .ne. CoupledVertex(idjhuvv(3:4),-1)) cycle
 
-         call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
+         call EvalAmp_VHiggs_heshyhack(id2,helicity,MomExt,me2)
          if(IsNaN(me2))return
 !if(me2.ne.0d0)then
 !  print *,id2(1),int(helicity(1)),id2(2),int(helicity(2)),id2(6),int(helicity(6)),id2(7),int(helicity(7))
@@ -2601,6 +2601,7 @@ real(8) :: helicity(9) !helicities
 integer :: id(9), id2(9),idjhuvv(1:4)
 integer :: tmp_idup(1:3), tmp_icolup(1:2,1:2)
 integer :: nVhels, nISs
+
 include 'csmaxvalue.f'
 
 EvalUnWeighted_VHiggs = 0d0
@@ -2826,7 +2827,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 !if pp collider
   if(Collider.eq.1)then
     id(1:2) = (/ifound,jfound/)
-    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+    call EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
     if(IsNaN(me2).or.(me2.eq.0d0))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac / 3d0
@@ -2837,7 +2838,8 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
     jfound=0
     id(2)=convertLHE(ElM_)
     id(1)=-id(2)
-    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+    call EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
+
     if(IsNaN(me2).or.(me2.eq.0d0))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
     LO_Res_Unpol = me2 * PreFac
@@ -2861,7 +2863,8 @@ elseif( IsAWDecay(DecayMode1) ) then
       id(7)=-id(7)
     endif
 
-    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+    call EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
+
     !if(me2.eq.0d0) then
     !  print *,"ME2=0 for id1,2,6,7=",id(1:2),id(6:7),helicity(1:2),helicity(6:7)
     !else
@@ -2915,7 +2918,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
     j = -i
     id(1:2) = (/i,j/)
 
-    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+    call EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
     if(IsNaN(me2))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
 
@@ -2931,7 +2934,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
   else if(Collider.eq.0)then
     id(2)=convertLHE(ElM_)
     id(1)=-id(2)
-    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+    call EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
     if(IsNaN(me2))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
     LO_Res_Unpol = me2 * PreFac
@@ -2959,7 +2962,7 @@ elseif( IsAWDecay(DecayMode1) ) then
 
     if (CoupledVertex(idjhuvv(1:2),-1) .ne. CoupledVertex(idjhuvv(3:4),-1)) cycle
 
-    call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
+    call EvalAmp_VHiggs_heshyhack(id2,helicity,MomExt,me2)
     !if (CoupledVertex(idjhuvv(3:4),-1).eq.Wm_) then
     !   print *,"Wminus found:",me2,id2(1:2),id2(6:7),helicity(1:2),helicity(6:7)
     !endif
@@ -3373,10 +3376,3 @@ END FUNCTION
 
 
 END MODULE ModCrossSection
-
-
-
-
-
-
-

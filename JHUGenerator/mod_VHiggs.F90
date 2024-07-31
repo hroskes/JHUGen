@@ -7,7 +7,7 @@ module ModVHiggs
 
 
   !----- notation for subroutines
-  public :: EvalAmp_VHiggs
+  public :: EvalAmp_VHiggs, EvalAmp_VHiggs_heshyhack
 
 contains
 
@@ -1732,5 +1732,49 @@ END SUBROUTINE
 
 
 
-end module ModVHiggs
 !!--YaofuZhou-----------------------------------------
+
+
+subroutine EvalAmp_VHiggs_heshyhack(id,helicity,MomExt,me2)
+    integer, intent(in) :: id(9)
+    real(8), intent(in) :: helicity(9)
+    real(8), intent(in) :: MomExt(1:4,1:9)
+    real(8), intent(out) :: me2
+    logical, save :: printedheshyhackmessage
+    complex(8) :: ghz1_tmp, ghz2_tmp
+    real(8) :: me2_noghz1, me2_noghz2
+
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+
+
+    !Heshy's hack to calculate only g1-g2 interference
+    if( .not.printedheshyhackmessage ) then
+      print *, "W       W  AAAAA  RRRRR   N    N   III  N    N  GGGGG"
+      print *, "W   W   W  A   A  R    R  NN   N   III  NN   N  G"
+      print *, "W   W   W  AAAAA  RRRRR   N N  N   III  N N  N  G  GGG"
+      print *, " W W W W   A   A  R R     N  N N   III  N  N N  G    G"
+      print *, "  W W W    A   A  R  R    N   NN   III  N   NN  GGGGGG"
+      print *, ""
+      print *, "You are generating only g1-g2 interference using a hack"
+      printedheshyhackmessage = .true.
+    endif
+
+    ghz1_tmp = ghz1
+    ghz1 = (0d0,0d0)
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2_noghz1)
+    ghz1 = ghz1_tmp
+
+    ghz2_tmp = ghz2
+    ghz2 = (0d0,0d0)
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2_noghz2)
+    ghz2 = ghz2_tmp
+
+    me2 = me2 - me2_noghz1 - me2_noghz2
+    if (me2 .lt. 0d0) then
+      print *, "me2 =", me2, "< 0"
+      return
+    endif
+
+RETURN
+END SUBROUTINE
+end module ModVHiggs
